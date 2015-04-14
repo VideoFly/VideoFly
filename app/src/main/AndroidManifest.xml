@@ -20,6 +20,10 @@
             android:name=".login"
             android:label="@string/title_activity_login" >
         </activity>
+        <activity
+            android:name=".splash"
+            android:label="@string/title_activity_splash" >
+        </activity>
     </application>
 
 </manifest>
