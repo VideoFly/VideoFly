@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">VideoFly</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="fbLoginButton">FB Login Button</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">login</string>
     <string name="title_activity_splash">splash</string>
+    <string name="appIcon">App Icon</string>
 </resources>
