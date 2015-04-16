@@ -6,4 +6,6 @@
     <string name="title_activity_login">login</string>
     <string name="title_activity_splash">splash</string>
     <string name="appIcon">App Icon</string>
+    <string name="facebook_app_id">434175606759777</string>
+    <string name="appID"></string>
 </resources>
