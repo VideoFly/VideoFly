@@ -1,11 +1,12 @@
 package example.com.videofly;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.provider.SyncStateContract;
+import android.util.Log;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -15,8 +16,14 @@ import android.widget.ImageView;
 import android.os.Handler;
 import android.widget.RelativeLayout;
 
+import com.parse.Parse;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
+
 
 public class splash extends Activity {
+
+    private static int SPLASH_TIME_OUT = 3000;
 
     public void onAttachedToWindow(){
         super.onAttachedToWindow();
@@ -24,10 +31,14 @@ public class splash extends Activity {
         window.setFormat(PixelFormat.RGBA_8888);
     }
 
-    private static int SPLASH_TIME_OUT = 2000;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Parse.initialize(this, "E1cW1qeS6TE9OnDlH1vbotgKaBCJ2guYjqWerWPB", "7HNxtourn6lDTBpXN91CgARVZotig7Rot6o3IjCW");
+        Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+        ParseFacebookUtils.initialize(this);
+
+        Log.d("MyApp", "Intialized facebook.");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
@@ -41,14 +52,15 @@ public class splash extends Activity {
 
             }
         }, SPLASH_TIME_OUT);
-
-
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
 
     private void StartSplashScreenAnim() {
-
-
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
         anim.reset();
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.splashLinLay);
@@ -69,9 +81,18 @@ public class splash extends Activity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Intent i = new Intent(splash.this, login.class);
-                startActivity(i);
-                finish();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                if(currentUser != null && (ParseFacebookUtils.isLinked(currentUser))){
+                    Intent i = new Intent(splash.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }
+                else{
+                    Intent i = new Intent(splash.this, login.class);
+                    startActivity(i);
+                    finish();
+                }
+
             }
 
             @Override
@@ -79,31 +100,5 @@ public class splash extends Activity {
 
             }
         });
-
-
-
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_splash, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
