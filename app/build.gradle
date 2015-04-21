@@ -1,9 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
+
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
     defaultConfig {
         applicationId "example.com.videofly"
         minSdkVersion 15
