@@ -39,6 +39,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ListActivity"
+            android:label="addList"></activity>
+
+        <activity android:name=".FriendActivity"
+            android:label="add_friendProfile"></activity>
+
+
     </application>
 
 </manifest>
