@@ -1,19 +1,14 @@
 package example.com.videofly;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.provider.SyncStateContract;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-
-
-import android.os.Handler;
 import android.widget.RelativeLayout;
 
 import com.parse.Parse;
@@ -21,9 +16,11 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 
+
+
 public class splash extends Activity {
 
-    private static int SPLASH_TIME_OUT = 3000;
+    private static int SPLASH_TIME_OUT = 1000;
 
     public void onAttachedToWindow(){
         super.onAttachedToWindow();
@@ -33,14 +30,15 @@ public class splash extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Parse.initialize(this, "E1cW1qeS6TE9OnDlH1vbotgKaBCJ2guYjqWerWPB", "7HNxtourn6lDTBpXN91CgARVZotig7Rot6o3IjCW");
-        Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
-        ParseFacebookUtils.initialize(this);
+        // Enable Local Datastore.
+        Parse.enableLocalDatastore(this);
 
-        Log.d("MyApp", "Intialized facebook.");
+        Parse.initialize(this, "9wThUeZxuDHAzZAvo9OaUQ0HuOwODiz8LAAqevtn", "v1prJmNjdU3rAMmuPWiUV5c5KZEthIhzFPJFebf2");
+        ParseFacebookUtils.initialize(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
 
         new Handler().postDelayed(new Runnable() {
 
