@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/friendImage"
+        android:src="@drawable/g_1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="7dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp" />
+
+    <LinearLayout
+        android:layout_toRightOf="@id/friendImage"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/nameText"
+            android:text="Guy Fieri"
+            android:textSize="25sp"
+            android:textColor="#000"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/numText"
+            android:text="200 Mutual Friends"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/addFriendButton"
+        android:layout_marginRight="7dp"
+        android:text="ADD"
+        android:textSize="20dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/button_style_add"
+        android:textColor="#FFF"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
