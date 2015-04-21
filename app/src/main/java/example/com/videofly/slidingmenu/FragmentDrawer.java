@@ -1,6 +1,7 @@
 package example.com.videofly.slidingmenu;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,9 @@ public class FragmentDrawer extends Fragment {
     private NavigationDrawerAdapter adapter;
     private View containerView;
     private static String[] titles = null;
+    private static TypedArray imageView = null;
     private FragmentDrawerListener drawerListener;
+
 
     public FragmentDrawer() {
 
@@ -50,6 +54,7 @@ public class FragmentDrawer extends Fragment {
         for (int i = 0; i < titles.length; i++) {
             NavDrawerItem navItem = new NavDrawerItem();
             navItem.setTitle(titles[i]);
+            navItem.setIcon(imageView.getResourceId(i,-1));
             data.add(navItem);
         }
         return data;
@@ -61,6 +66,7 @@ public class FragmentDrawer extends Fragment {
 
         // drawer labels
         titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
+        imageView = getActivity().getResources().obtainTypedArray(R.array.nav_drawer_icons);
     }
 
     @Override

@@ -33,7 +33,7 @@ public class splash extends Activity {
         // Enable Local Datastore.
         Parse.enableLocalDatastore(this);
 
-        Parse.initialize(this, "9wThUeZxuDHAzZAvo9OaUQ0HuOwODiz8LAAqevtn", "v1prJmNjdU3rAMmuPWiUV5c5KZEthIhzFPJFebf2");
+        Parse.initialize(this, "I7zuvwYhjC8TglLLHeLkUPEbW5Ppx2XS67MUCRDm", "MRXLaui8yk4oBJZoTYjCMsB06n5BVk9iZYot10v6");
         ParseFacebookUtils.initialize(this);
 
         super.onCreate(savedInstanceState);
