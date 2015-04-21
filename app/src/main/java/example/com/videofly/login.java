@@ -20,7 +20,6 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
-
 public class login extends Activity {
 
     private Dialog mProgressDialog;
