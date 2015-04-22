@@ -1,19 +1,14 @@
 package example.com.videofly;
 
-import android.os.Bundle;
-import android.os.Handler;
+import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.facebook.AccessToken;
-
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.login.widget.ProfilePictureView;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -23,27 +18,27 @@ import java.util.ArrayList;
  */
 public class User {
 
-    private ProfilePictureView userProfilePictureView;
+    private Bitmap userProfilePicture;
     private String userName;
     private String userEmail;
     private ArrayList userFriends;
     private String user_fb_id;
-    private JSONObject usr;
+
 
     ParseUser parseUser = ParseUser.getCurrentUser();
 
 
     public User() {
-        makeMeRequest();
-        fbFriendsRequest();
+
     }
 
-    public ProfilePictureView getUserProfilePictureView() {
-        return userProfilePictureView;
+    public Bitmap getUserProfilePicture() {
+        return userProfilePicture;
     }
 
-    public void setUserProfilePictureView(ProfilePictureView userProfilePictureView) {
-        this.userProfilePictureView = userProfilePictureView;
+    public void setUserProfilePicture(Bitmap userProfilePicture) {
+        this.userProfilePicture = userProfilePicture;
+
     }
 
     public String getUserName() {
@@ -70,7 +65,9 @@ public class User {
 
     public void setUser_fb_id(String user_fb_id) {
         this.user_fb_id = user_fb_id;
-        parseUser.put("fb_id",user_fb_id);
+
+        parseUser.put("fb_id", user_fb_id);
+        Log.d("loidfsdafsa", "" + Profile.getCurrentProfile() + "");
     }
 
     public ArrayList getUserFriends() {
@@ -88,43 +85,6 @@ public class User {
             }
         }
         parseUser.put("fb_friends", this.userFriends);
-    }
-
-    private void fbFriendsRequest(){
-        GraphRequest request = GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONArrayCallback() {
-                    @Override
-                    public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
-                        setUserFriends(jsonArray);
-                        ParseUser.getCurrentUser().saveEventually();
-                    }
-                });
-        request.executeAsync();
-    }
-
-
-    private void makeMeRequest() {
-
-        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        usr = object;
-                        updateUserData();
-                    }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-
-    private void updateUserData() {
-        setUser_fb_id(usr.optString("id"));
-        setUserName(usr.optString("name"));
-        setUserEmail(usr.optString("email"));
-        ParseUser.getCurrentUser().saveEventually();
     }
 
 }

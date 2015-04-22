@@ -2,6 +2,7 @@ package example.com.videofly.slidingmenu;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -37,10 +38,15 @@ public class FragmentDrawer extends Fragment {
     private static String[] titles = null;
     private static TypedArray imageView = null;
     private FragmentDrawerListener drawerListener;
+    private Bitmap profilePicture;
 
 
     public FragmentDrawer() {
 
+    }
+
+    public FragmentDrawer(Bitmap bitmap) {
+        this.profilePicture = bitmap;
     }
 
     public void setDrawerListener(FragmentDrawerListener listener) {
@@ -78,7 +84,7 @@ public class FragmentDrawer extends Fragment {
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         ImageView headImage = (ImageView)layout.findViewById(R.id.profileImage);
         headImage.setImageResource(R.drawable.appicon);
-
+        //headImage.setImageBitmap(profilePicture);
 
 
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
