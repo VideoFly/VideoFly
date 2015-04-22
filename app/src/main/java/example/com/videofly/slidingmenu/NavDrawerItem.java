@@ -23,28 +23,43 @@ public class NavDrawerItem {
         this.icon = icon;
     }
 
+    /**
+     * @return true if notifications for the current listItem is being displayed.
+     */
     public boolean isShowNotify() {
         return showNotify;
     }
 
+    /**
+     * @param showNotify sets notifications for the current listItem to display.
+     */
     public void setShowNotify(boolean showNotify) {
         this.showNotify = showNotify;
     }
-
+    /**
+     * @return the tittle of the list Item.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * @param title - the name of the listItem you want to display on the sidebar.
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
-    //ImageIcon fields are added to add icons next to each items. (TO DO)
-
+    /**
+     * @return the image icon of the list Item.
+     */
     public int getIcon(){
         return icon;
     }
 
+    /**
+     * @param icon - the icon associated with the list item.
+     */
     public void setIcon(int icon){
         this.icon = icon;
     }

@@ -23,6 +23,7 @@ import example.com.videofly.R;
 
 /**
  * Created by madhavchhura on 4/20/15.
+ * This class mainly handles the sidebar list contents. Including title, icons, and
  */
 public class FragmentDrawer extends Fragment {
 
@@ -60,6 +61,7 @@ public class FragmentDrawer extends Fragment {
         return data;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +76,11 @@ public class FragmentDrawer extends Fragment {
                              Bundle savedInstanceState) {
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        ImageView headImage = (ImageView)layout.findViewById(R.id.profileImage);
+        headImage.setImageResource(R.drawable.appicon);
+
+
+
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
 
         adapter = new NavigationDrawerAdapter(getActivity(), getData());

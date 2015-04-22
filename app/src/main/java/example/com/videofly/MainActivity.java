@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
@@ -25,6 +26,15 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                User user = new User();
+            }
+        });
+//        User user = new User();
+//        ParseUser.getCurrentUser().saveEventually();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

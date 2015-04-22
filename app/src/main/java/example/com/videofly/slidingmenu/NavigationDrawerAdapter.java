@@ -49,7 +49,9 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
 
     }
-
+    /**
+     * @return the total number of items on the Sidebar.
+     */
     @Override
     public int getItemCount() {
         return data.size();
