@@ -33,6 +33,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import example.com.videofly.fragments.FriendsFragment;
+import example.com.videofly.fragments.HomeFragment;
+import example.com.videofly.fragments.MessagesFragment;
+import example.com.videofly.fragments.SettingsFragment;
 import example.com.videofly.slidingmenu.FragmentDrawer;
 
 public class MainActivity extends ActionBarActivity implements FragmentDrawer.FragmentDrawerListener {

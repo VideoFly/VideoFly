@@ -1,4 +1,4 @@
-package example.com.videofly;
+package example.com.videofly.fragments;
 
 import android.app.Activity;
 import android.support.v4.app.Fragment;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
+import example.com.videofly.Friends;
+import example.com.videofly.R;
 import example.com.videofly.friendscards.FriendsAdapter;
 
 /**

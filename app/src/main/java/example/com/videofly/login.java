@@ -1,10 +1,11 @@
 package example.com.videofly;
 
-import android.app.Activity;
 import android.app.Dialog;
 //import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,19 +21,23 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
-public class login extends Activity {
+public class login extends ActionBarActivity{
 
     private Dialog mProgressDialog;
+    private Toolbar mToolbar;
 
     //public static boolean loggedIn = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
 
 
         ImageButton mLoginButton = (ImageButton) findViewById(R.id.fb_login_button);

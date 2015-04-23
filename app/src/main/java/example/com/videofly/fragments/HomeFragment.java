@@ -1,4 +1,4 @@
-package example.com.videofly;
+package example.com.videofly.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import example.com.videofly.R;
+import example.com.videofly.User;
 
 /**
  * Created by madhavchhura on 4/20/15.

@@ -1,4 +1,4 @@
-package example.com.videofly;
+package example.com.videofly.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import example.com.videofly.R;
+
+
 /**
  * Created by madhavchhura on 4/21/15.
  */
-public class MessagesFragment extends Fragment{
-    public MessagesFragment(){
-
+public class SettingsFragment extends Fragment {
+    public SettingsFragment(){
     }
 
     @Override
@@ -24,7 +26,7 @@ public class MessagesFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
 
         // Inflate the layout for this fragment
