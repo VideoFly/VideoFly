@@ -3,18 +3,32 @@ package example.com.videofly;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.ArrayList;
+
+import example.com.videofly.friendscards.FriendsAdapter;
 
 /**
  * Created by madhavchhura on 4/21/15.
  */
 public class FriendsFragment extends Fragment {
+    private static ArrayList<Friends> data = null;
+    private FriendsAdapter adapter;
+    RecyclerView recyclerView;
 
     public FriendsFragment(){
 
     }
+
+    public FriendsFragment(ArrayList<Friends> friends){
+        data = friends;
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,8 +39,13 @@ public class FriendsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_friends, container, false);
+        View rootView = inflater.inflate(R.layout.card_layout, container, false);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.rv);
+        recyclerView.setHasFixedSize(true);
 
+        adapter = new FriendsAdapter(data);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Inflate the layout for this fragment
         return rootView;

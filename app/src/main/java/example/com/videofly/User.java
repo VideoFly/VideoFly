@@ -4,11 +4,11 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.facebook.Profile;
-import com.facebook.login.widget.ProfilePictureView;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ public class User {
     private Bitmap userProfilePicture;
     private String userName;
     private String userEmail;
-    private ArrayList userFriends;
+    private ArrayList<Friends> userFriends;
     private String user_fb_id;
 
 
@@ -70,7 +70,7 @@ public class User {
         Log.d("loidfsdafsa", "" + Profile.getCurrentProfile() + "");
     }
 
-    public ArrayList getUserFriends() {
+    public ArrayList<Friends> getUserFriends() {
         return userFriends;
     }
     public void setUserFriends(JSONArray userFriends){
@@ -78,13 +78,15 @@ public class User {
         if(userFriends!=null){
             for(int i = 0; i < userFriends.length(); i++){
                 try {
-                    this.userFriends.add(userFriends.get(i).toString());
+                    JSONObject childObject = userFriends.getJSONObject(i);
+                    this.userFriends.add(new Friends(childObject.getString("name"),
+                            childObject.getString("id")));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         }
-        parseUser.put("fb_friends", this.userFriends);
+        //parseUser.put("fb_friends", this.userFriends);
     }
 
 }

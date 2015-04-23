@@ -39,7 +39,7 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
 
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
-    private User user;
+    public  User user;
     private JSONObject usr;
     private Bitmap bitmap;
 
@@ -153,7 +153,7 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                 title = getString(R.string.title_home);
                 break;
             case 1:
-                fragment = new FriendsFragment();
+                fragment = new FriendsFragment(user.getUserFriends());
                 title = getString(R.string.title_friends);
                 break;
             case 2:
