@@ -50,7 +50,7 @@ public class login extends Activity {
     private void userLogin() {
         //mProgressDialog = ProgressDialog.show(this, "Logging in", "Facebook", true);
 
-        List<String> permissions = Arrays.asList("user_friends");
+        List<String> permissions = Arrays.asList("user_friends", "email");
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
