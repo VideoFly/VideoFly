@@ -56,7 +56,6 @@ public class FragmentDrawer extends Fragment {
     public static List<NavDrawerItem> getData() {
         List<NavDrawerItem> data = new ArrayList<>();
 
-
         // preparing navigation drawer items
         for (int i = 0; i < titles.length; i++) {
             NavDrawerItem navItem = new NavDrawerItem();
@@ -107,6 +106,8 @@ public class FragmentDrawer extends Fragment {
 
         return layout;
     }
+
+
 
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, final Toolbar toolbar) {
@@ -189,4 +190,5 @@ public class FragmentDrawer extends Fragment {
     public interface FragmentDrawerListener {
         public void onDrawerItemSelected(View view, int position);
     }
+
 }

@@ -9,7 +9,6 @@
     <string name="facebook_app_id">743914899061568</string>
     <string name="appID"></string>
     <string name="login">Login</string>
-    <string name="logout">Logout</string>
     <string name="action_search">Search</string>
 
     <!-- Content Description -->
@@ -23,6 +22,7 @@
     <string name="nav_item_friends">Friends</string>
     <string name="nav_item_notifications">Messages</string>
     <string name="nav_item_settings">Settings</string>
+    <string name="nav_item_logout">Logout</string>
 
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="drawer_open">Open</string>
@@ -34,6 +34,7 @@
         <item>@string/nav_item_friends</item>
         <item>@string/nav_item_notifications</item>
         <item>@string/nav_item_settings</item>
+        <item>@string/nav_item_logout</item>
     </string-array>
 
 
@@ -44,7 +45,7 @@
         <item>@drawable/ic_people</item>
         <item>@drawable/ic_photos</item>
         <item>@drawable/ic_communities</item>
-        <item>@drawable/ic_pages</item>
+        <item>@drawable/ic_logout</item>
     </array>
 
 

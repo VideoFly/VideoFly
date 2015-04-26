@@ -1,11 +1,9 @@
 package example.com.videofly;
 
 import android.app.Dialog;
-//import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,34 +19,34 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
+//import android.app.ProgressDialog;
+
 public class login extends ActionBarActivity{
 
     private Dialog mProgressDialog;
-    private Toolbar mToolbar;
+    private ImageButton mLoginButton;
+    //private Toolbar mToolbar;
 
     //public static boolean loggedIn = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
 
-        ImageButton mLoginButton = (ImageButton) findViewById(R.id.fb_login_button);
+        mLoginButton = (ImageButton) findViewById(R.id.fb_login_button);
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                mLoginButton.setEnabled(false);
                 userLogin();
 
             }
         });
-
 
     }
 
@@ -60,23 +58,19 @@ public class login extends ActionBarActivity{
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
-
+                mLoginButton.setEnabled(true);
                 if (user == null) {
                     Log.d("login-activity", "Uh oh. The user cancelled the Facebook login.");
-                    Toast.makeText(getApplicationContext(),"Unable to Login! Try Again", Toast.LENGTH_SHORT).show();
-                }
-
-                else if (user.isNew()) {
+                    Toast.makeText(getApplicationContext(), "Unable to Login! Try Again", Toast.LENGTH_SHORT).show();
+                } else if (user.isNew()) {
                     Log.d("login-activity", "User signed up and logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(),"Login Successful!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(login.this, MainActivity.class);
                     startActivity(i);
                     finish();
-                }
-
-                else {
+                } else {
                     Log.d("login-activity", "User logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(),"Login Successful! Try Again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login Successful! Try Again", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(login.this, MainActivity.class);
                     startActivity(i);
                     finish();
@@ -89,9 +83,7 @@ public class login extends ActionBarActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
-
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_login, menu);
         return true;
     }
 
@@ -104,11 +96,9 @@ public class login extends ActionBarActivity{
 
         switch (id){
             case R.id.login:
+                mLoginButton.setEnabled(false);
                 userLogin();
             break;
-
-            case R.id.action_settings:
-                return true;
 
         }
         return super.onOptionsItemSelected(item);

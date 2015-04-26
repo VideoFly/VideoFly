@@ -12,8 +12,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+
 import android.view.View;
 import android.widget.Toast;
 
@@ -143,10 +142,10 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         return bitmap;
     }
 
-        @Override
-        public void onDrawerItemSelected(View view, int position) {
-            displayView(position);
-        }
+    @Override
+    public void onDrawerItemSelected(View view, int position) {
+        displayView(position);
+    }
 
     private void displayView(int position) {
         Fragment fragment = null;
@@ -167,6 +166,10 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
             case 3:
                 fragment = new SettingsFragment();
                 title = getString(R.string.tittle_settings);
+                break;
+            case 4:
+                logout();
+                break;
             default:
                 break;
         }
@@ -182,23 +185,8 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-
-
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if(id == R.id.logout && ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
+    private void logout(){
+        if(ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
 
             ParseUser.logOut();
 
@@ -207,13 +195,8 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
             startActivity(i);
             finish();
         }
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
