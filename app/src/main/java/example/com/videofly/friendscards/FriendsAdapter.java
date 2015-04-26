@@ -53,11 +53,10 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
 
     @Override
     public void onBindViewHolder(FriendsViewHolder holder, int position){
-        Log.d("Friends View Holder", "Assigning values");
+        Log.d("Friends View Holder", "Assigning Friends values");
         holder.personName.setText(friendsList.get(position).getName());
         holder.personId.setText(friendsList.get(position).getId());
-        Log.d("*****", friendsList.get(position).getName());
-        Log.d("*****", friendsList.get(position).getName());
+        holder.personPhoto.setImageBitmap(friendsList.get(position).getProfilePic());
     }
 
     @Override

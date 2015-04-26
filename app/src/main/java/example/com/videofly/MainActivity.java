@@ -1,8 +1,11 @@
 package example.com.videofly;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -37,8 +40,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
+
 
 import example.com.videofly.fragments.FriendsFragment;
 import example.com.videofly.fragments.HomeFragment;
@@ -57,12 +60,10 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
         StrictMode.setThreadPolicy(policy);
+
         user = new User();
         makeMeRequest();
-        fbFriendsRequest();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -84,7 +85,14 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         displayView(0);
     }
 
-
+    class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
+    {
+        protected Void doInBackground(JSONArray... arg0) {
+            Log.d("DoINBackGround","On doInBackground...");
+            user.setUserFriends(arg0[0]);
+            return null;
+        }
+    }
 
     private void makeMeRequest() {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
@@ -108,8 +116,8 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
-                    public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
-                        user.setUserFriends(jsonArray);
+                    public void onCompleted(final JSONArray jsonArray, GraphResponse graphResponse) {
+                        new getFriendsAsync().execute(jsonArray);
                         createDisplay();
                     }
                 });
@@ -122,12 +130,9 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         user.setUserEmail(usr.optString("email"));
 
         ParseUser.getCurrentUser().saveInBackground();
-        //ParseUser.getCurrentUser().saveEventually();
     }
 
-
     private Bitmap userPic() {
-
 
         HttpClient client = new DefaultHttpClient();
         HttpResponse response;

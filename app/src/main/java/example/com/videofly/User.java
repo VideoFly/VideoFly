@@ -1,15 +1,15 @@
 package example.com.videofly;
 
 import android.graphics.Bitmap;
-import android.util.Log;
+import android.os.AsyncTask;
 
-import com.facebook.Profile;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -71,7 +71,7 @@ public class User {
     public ArrayList<Friends> getUserFriends() {
         return userFriends;
     }
-    public void setUserFriends(JSONArray userFriends){
+    public void setUserFriends(final JSONArray userFriends) {
         this.userFriends = new ArrayList();
         if(userFriends!=null){
             for(int i = 0; i < userFriends.length(); i++){
@@ -85,5 +85,4 @@ public class User {
             }
         }
     }
-
 }
