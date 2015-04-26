@@ -36,7 +36,7 @@
         <item>@string/nav_item_friends</item>
         <item>@string/nav_item_messages</item>
         <item>@string/nav_item_invite_friends</item>
-        <item>@string/nav_iztem_settings</item>
+        <item>@string/nav_item_settings</item>
         <item>@string/nav_item_logout</item>
     </string-array>
 
@@ -46,7 +46,7 @@
     <array name="nav_drawer_icons">
         <item>@drawable/ic_home</item>
         <item>@drawable/ic_friends</item>
-        <item>@drawable/ic_photos</item>
+        <item>@drawable/ic_message</item>
         <item>@drawable/ic_invite_friends</item>
         <item>@drawable/ic_settings</item>
         <item>@drawable/ic_logout</item>
