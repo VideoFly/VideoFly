@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import example.com.videofly.R;
@@ -39,8 +40,9 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         TextView homeText = (TextView) rootView.findViewById(R.id.label);
-        //ImageView imageView = (ImageView) rootView.findViewById(R.id.pic);
-        //imageView.setImageResource(R.drawable.appicon);
+        ImageView imageView = (ImageView) rootView.findViewById(R.id.pic);
+
+        imageView.setImageBitmap(userProfile.getUserProfilePicture());
 
 
         Log.d("In OnCreateView", ""+userProfile.getUserName()+"");

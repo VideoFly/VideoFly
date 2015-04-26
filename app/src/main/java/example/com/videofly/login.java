@@ -19,21 +19,13 @@ import com.parse.ParseUser;
 import java.util.Arrays;
 import java.util.List;
 
-//import android.app.ProgressDialog;
 
 public class login extends ActionBarActivity{
 
-    private Dialog mProgressDialog;
     private ImageButton mLoginButton;
-    //private Toolbar mToolbar;
-
-    //public static boolean loggedIn = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -51,8 +43,6 @@ public class login extends ActionBarActivity{
     }
 
     private void userLogin() {
-        //mProgressDialog = ProgressDialog.show(this, "Logging in", "Facebook", true);
-
         List<String> permissions = Arrays.asList("user_friends", "email");
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
@@ -70,7 +60,7 @@ public class login extends ActionBarActivity{
                     finish();
                 } else {
                     Log.d("login-activity", "User logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "Login Successful! Try Again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(login.this, MainActivity.class);
                     startActivity(i);
                     finish();

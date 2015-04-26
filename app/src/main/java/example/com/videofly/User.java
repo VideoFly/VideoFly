@@ -65,9 +65,7 @@ public class User {
 
     public void setUser_fb_id(String user_fb_id) {
         this.user_fb_id = user_fb_id;
-
         parseUser.put("fb_id", user_fb_id);
-        Log.d("loidfsdafsa", "" + Profile.getCurrentProfile() + "");
     }
 
     public ArrayList<Friends> getUserFriends() {
@@ -86,7 +84,6 @@ public class User {
                 }
             }
         }
-        //parseUser.put("fb_friends", this.userFriends);
     }
 
 }

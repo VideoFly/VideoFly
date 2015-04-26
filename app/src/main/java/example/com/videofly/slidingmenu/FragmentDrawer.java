@@ -82,11 +82,13 @@ public class FragmentDrawer extends Fragment {
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         ImageView headImage = (ImageView)layout.findViewById(R.id.profileImage);
-        headImage.setImageResource(R.drawable.appicon);
-        //headImage.setImageBitmap(profilePicture);
+        //headImage.setImageResource(R.drawable.appicon);
+
+        headImage.setImageBitmap(profilePicture);
 
 
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
+
 
         adapter = new NavigationDrawerAdapter(getActivity(), getData());
         recyclerView.setAdapter(adapter);

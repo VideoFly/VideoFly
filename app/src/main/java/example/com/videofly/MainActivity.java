@@ -25,9 +25,17 @@ import com.facebook.Profile;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -88,16 +96,10 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                         fbFriendsRequest();
                         bitmap = userPic();
                         user.setUserProfilePicture(bitmap);
-                        if(bitmap == null){
-                            Log.d("In MainActivity Request", "NULL");
-                        }
-                        if(user.getUserProfilePicture() == null){
-                            Log.d("In MainActivity Request", "NULLLLLL");
-                        }
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email");
+        parameters.putString("fields", "id,name,email,picture.width(300)");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -109,7 +111,6 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                     public void onCompleted(JSONArray jsonArray, GraphResponse graphResponse) {
                         user.setUserFriends(jsonArray);
                         createDisplay();
-                        ParseUser.getCurrentUser().saveEventually();
                     }
                 });
         request.executeAsync();
@@ -119,24 +120,31 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         user.setUser_fb_id(usr.optString("id"));
         user.setUserName(usr.optString("name"));
         user.setUserEmail(usr.optString("email"));
-        ParseUser.getCurrentUser().saveEventually();
+
+        ParseUser.getCurrentUser().saveInBackground();
+        //ParseUser.getCurrentUser().saveEventually();
     }
 
 
     private Bitmap userPic() {
 
+
+        HttpClient client = new DefaultHttpClient();
+        HttpResponse response;
         try {
             URL url = new URL("http://graph.facebook.com/"
                     + Profile.getCurrentProfile().getId()+ "/picture");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-            bitmap = BitmapFactory.decodeStream(input);
-
-            return bitmap;
-        }
-        catch (Exception e) {
+            HttpGet request = new HttpGet(String.valueOf(url));
+            response = client.execute(request);
+            HttpEntity entity = response.getEntity();
+            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
+            InputStream inputStream = bufferedEntity.getContent();
+            bitmap = BitmapFactory.decodeStream(inputStream);
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return bitmap;

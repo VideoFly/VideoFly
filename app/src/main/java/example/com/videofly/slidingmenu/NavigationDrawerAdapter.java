@@ -5,12 +5,14 @@ package example.com.videofly.slidingmenu;
  */
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +49,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         holder.title.setText(current.getTitle());
         holder.imageView.setImageResource(current.getIcon());
 
-
     }
     /**
      * @return the total number of items on the Sidebar.
@@ -65,7 +66,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.title);
             imageView = (ImageView) itemView.findViewById(R.id.icon);
-
         }
     }
 }
