@@ -177,12 +177,17 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                 title = getString(R.string.title_messages);
                 break;
             case 3:
+                fragment = new MessagesFragment();
+                title = getString(R.string.tittle_invite_friends);
+                break;
+            case 4:
                 fragment = new SettingsFragment();
                 title = getString(R.string.tittle_settings);
                 break;
-            case 4:
+            case 5:
                 logout();
                 break;
+
             default:
                 break;
         }

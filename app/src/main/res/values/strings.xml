@@ -15,12 +15,14 @@
     <string name="title_home">Home</string>
     <string name="title_friends">Friends</string>
     <string name="title_messages">Messages</string>
+    <string name="tittle_invite_friends">Invite Friends</string>
     <string name="tittle_settings">Settings</string>
 
     <!--Nav Drawer Menu Items -->
     <string name="nav_item_home">Home</string>
     <string name="nav_item_friends">Friends</string>
-    <string name="nav_item_notifications">Messages</string>
+    <string name="nav_item_messages">Messages</string>
+    <string name="nav_item_invite_friends">Invite Friends</string>
     <string name="nav_item_settings">Settings</string>
     <string name="nav_item_logout">Logout</string>
 
@@ -32,8 +34,9 @@
     <string-array name="nav_drawer_labels">
         <item>@string/nav_item_home</item>
         <item>@string/nav_item_friends</item>
-        <item>@string/nav_item_notifications</item>
-        <item>@string/nav_item_settings</item>
+        <item>@string/nav_item_messages</item>
+        <item>@string/nav_item_invite_friends</item>
+        <item>@string/nav_iztem_settings</item>
         <item>@string/nav_item_logout</item>
     </string-array>
 
@@ -42,9 +45,10 @@
     <!-- Keep them in order as the titles are in -->
     <array name="nav_drawer_icons">
         <item>@drawable/ic_home</item>
-        <item>@drawable/ic_people</item>
+        <item>@drawable/ic_friends</item>
         <item>@drawable/ic_photos</item>
-        <item>@drawable/ic_communities</item>
+        <item>@drawable/ic_invite_friends</item>
+        <item>@drawable/ic_settings</item>
         <item>@drawable/ic_logout</item>
     </array>
 
