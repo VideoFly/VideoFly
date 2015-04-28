@@ -10,4 +10,11 @@
         android:icon="@drawable/ic_action_search"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/invite_friends"
+        android:title="Invite Friends"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_invite_friends"
+        app:showAsAction="always"/>
+
 </menu>

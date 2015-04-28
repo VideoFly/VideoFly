@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
         TextView homeText = (TextView) rootView.findViewById(R.id.label);
         ImageView imageView = (ImageView) rootView.findViewById(R.id.pic);
 
+        //For Test Purposes.
         imageView.setImageBitmap(userProfile.getUserProfilePicture());
 
 

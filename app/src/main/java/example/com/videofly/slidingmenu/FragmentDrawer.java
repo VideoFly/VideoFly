@@ -3,6 +3,7 @@ package example.com.videofly.slidingmenu;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -10,17 +11,23 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import example.com.videofly.R;
+import example.com.videofly.User;
+import example.com.videofly.fragments.SettingsFragment;
 
 /**
  * Created by madhavchhura on 4/20/15.
@@ -81,7 +88,19 @@ public class FragmentDrawer extends Fragment {
                              Bundle savedInstanceState) {
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
-        ImageView headImage = (ImageView)layout.findViewById(R.id.profileImage);
+        ImageView profileImageView = (ImageView)layout.findViewById(R.id.profile_image);
+        final ImageView editImageView = (ImageView) layout.findViewById(R.id.editImage);
+        TextView nameTextView = (TextView) layout.findViewById(R.id.name);
+        nameTextView.setText(ParseUser.getCurrentUser().getUsername());
+
+        editImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerListener.onDrawerItemSelected(v,3);
+                mDrawerLayout.closeDrawer(containerView);
+            }
+        });
+
 
         // ** Doesnt Work unable to display pic
         // headImage.setImageBitmap(profilePicture);
@@ -96,6 +115,10 @@ public class FragmentDrawer extends Fragment {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
+
+                    Log.d("In on Click", "image view is clicked");
+                    //Fragment settings = new SettingsFragment();
+
                 drawerListener.onDrawerItemSelected(view, position);
                 mDrawerLayout.closeDrawer(containerView);
             }

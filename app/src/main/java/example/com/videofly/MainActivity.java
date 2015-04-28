@@ -1,30 +1,31 @@
 package example.com.videofly;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-
 import com.facebook.AccessToken;
+import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
-
+import com.facebook.share.model.AppInviteContent;
+import com.facebook.share.widget.AppInviteDialog;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
@@ -42,7 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-
+import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
 import example.com.videofly.fragments.HomeFragment;
 import example.com.videofly.fragments.MessagesFragment;
@@ -92,6 +93,11 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
             user.setUserFriends(arg0[0]);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 
     private void makeMeRequest() {
@@ -102,8 +108,8 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                         usr = object;
                         updateUserData();
                         fbFriendsRequest();
-                        bitmap = userPic();
-                        user.setUserProfilePicture(bitmap);
+                        //bitmap = userPic();
+                        //user.setUserProfilePicture(bitmap);
                     }
                 });
         Bundle parameters = new Bundle();
@@ -157,6 +163,9 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
 
     @Override
     public void onDrawerItemSelected(View view, int position) {
+        if(view.equals(findViewById(R.id.editImage))){
+            position = 3;
+        }
         displayView(position);
     }
 
@@ -177,14 +186,10 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                 title = getString(R.string.title_messages);
                 break;
             case 3:
-                fragment = new MessagesFragment();
-                title = getString(R.string.tittle_invite_friends);
-                break;
-            case 4:
                 fragment = new SettingsFragment();
                 title = getString(R.string.tittle_settings);
                 break;
-            case 5:
+            case 4:
                 logout();
                 break;
 
@@ -212,6 +217,52 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
             Intent i = new Intent(MainActivity.this, login.class);
             startActivity(i);
             finish();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.action_search:
+                return true;
+            case R.id.invite_friends:
+                inviteFriends();
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void inviteFriends() {
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        Uri targetUrl = AppLinks.getTargetUrlFromInboundIntent(this, getIntent());
+        if (targetUrl != null) {
+            Log.i("Activity", "App Link Target URL: " + targetUrl.toString());
+        }
+
+        String appLinkUrl, previewImageUrl;
+
+        appLinkUrl = "https://fb.me/747689235350801";
+        previewImageUrl = "https://www.mydomain.com/my_invite_image.jpg";
+
+        if (AppInviteDialog.canShow()) {
+            AppInviteContent content = new AppInviteContent.Builder()
+                    .setApplinkUrl(appLinkUrl)
+                    .setPreviewImageUrl(previewImageUrl)
+                    .build();
+            AppInviteDialog.show(this, content);
         }
     }
 
