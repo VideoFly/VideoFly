@@ -37,11 +37,11 @@ public class User {
 
     }
 
-    public Bitmap getUserProfilePicture() {
+    public Bitmap getUserImageBitmap() {
         return userProfilePicture;
     }
 
-    public void setUserProfilePicture(Bitmap userProfilePicture) {
+    public void setUserImageBitmap(Bitmap userProfilePicture) {
         this.userProfilePicture = userProfilePicture;
 
     }

@@ -80,14 +80,12 @@ public class splash extends Activity {
                 if(currentUser != null && (ParseFacebookUtils.isLinked(currentUser))){
                     finish();
                     Intent i = new Intent(splash.this, MainActivity.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                     finish();
                 }
                 else{
                     finish();
                     Intent i = new Intent(splash.this, login.class);
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                     finish();
                 }

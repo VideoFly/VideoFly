@@ -10,7 +10,6 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,31 +30,18 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
-import com.parse.FindCallback;
-import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.List;
 
 import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
@@ -68,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
-    private  User user, temp;
+    private  User user;
     private JSONObject usr;
     private Bitmap imgBitmap = null;
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -78,14 +64,15 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
 
         user = new User();
         makeMeRequest();
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
     }
 
     private void createDisplay() {
@@ -94,7 +81,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        drawerFragment = new FragmentDrawer(user);
+        drawerFragment = new FragmentDrawer();
+        Bundle args = new Bundle();
+        args.putParcelable("imgBitmap", imgBitmap);
+
+        drawerFragment.setArguments(args);
         drawerFragment = (FragmentDrawer)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
@@ -104,22 +95,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         displayView(0);
     }
 
-    class getUserInformation extends AsyncTask<Void, Void, Void>
-    {
-        protected Void doInBackground(Void... arg0) {
-            Log.d("DoINBackGround","On doInBackground...");
-            user.setUser_fb_id(ParseUser.getCurrentUser().getString("fb_id"));
-            user.setUserName(ParseUser.getCurrentUser().getUsername());
-            user.setUserEmail(ParseUser.getCurrentUser().getEmail());
-            user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-    }
 
     class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
     {
@@ -146,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     }
                 });
         Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email,picture.width(300)");
+        parameters.putString("fields", "id,name,email");
         request.setParameters(parameters);
         request.executeAsync();
     }
@@ -166,24 +141,31 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private void updateUserData() {
         user.setUser_fb_id(usr.optString("id"));
         user.setUserName(usr.optString("name"));
+        Log.d("THIS DOESNT MAKE SENSE", user.getUserName());
         user.setUserEmail(usr.optString("email"));
-        user.setUserImage(uploadImageFile(
-                BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile)));
 
+        if(ParseUser.getCurrentUser().isNew()){
+            imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
+            user.setUserImage(uploadImageFile(imgBitmap));
+        }
+        else{
+            user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
+        }
         ParseUser.getCurrentUser().saveInBackground();
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
+        imgBitmap = image;
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         ParseFile parseFile = new ParseFile(user.getUser_fb_id()+".png", byteArray);
-
         parseFile.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
+                Toast.makeText(getApplicationContext(), "DONE", Toast.LENGTH_LONG).show();
                 if (e != null) {
-                    Log.d("Error Saving",e.getMessage());
+                    Log.d("Error Saving", e.getMessage());
                     Toast.makeText(getApplicationContext(), "Error Saving" + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -191,29 +173,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         return parseFile;
     }
 
-//    private Bitmap userPic() {
-//
-//        HttpClient client = new DefaultHttpClient();
-//        HttpResponse response;
-//        try {
-//            URL url = new URL("http://icons.webpatashala.com/" +
-//                    "icons/Face-Avatars-Icons/Png/" +
-//                    "Male-Face-L3-icon-2013103.PNG");
-//            HttpGet request = new HttpGet(String.valueOf(url));
-//            response = client.execute(request);
-//            HttpEntity entity = response.getEntity();
-//            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
-//            InputStream inputStream = bufferedEntity.getContent();
-//            bitmap = BitmapFactory.decodeStream(inputStream);
-//        } catch (ClientProtocolException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        return bitmap;
-//    }
 
     @Override
     public void onDrawerItemSelected(View view, int position) {
@@ -222,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 //        }
         displayView(position);
     }
+
 
     private void displayView(int position) {
         Fragment fragment = null;
@@ -370,7 +330,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             Log.d("In on Acitivity Result", "creating new Fragment Drawer");
             Bundle extras = data.getExtras();
             imgBitmap = (Bitmap) extras.get("data");
-            user.setUserProfilePicture(imgBitmap);
+            user.setUserImage(uploadImageFile(imgBitmap));
+            ParseUser.getCurrentUser().saveInBackground();
             drawerFragment.setProfileImageView(imgBitmap);
         }
         else if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK){
@@ -380,7 +341,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            user.setUserProfilePicture(imgBitmap);
+            user.setUserImage(uploadImageFile(imgBitmap));
+            ParseUser.getCurrentUser().saveInBackground();
             drawerFragment.setProfileImageView(imgBitmap);
         }
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);

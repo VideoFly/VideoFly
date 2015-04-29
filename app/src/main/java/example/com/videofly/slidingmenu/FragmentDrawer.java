@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.videofly.R;
-import example.com.videofly.User;
 
 /**
  * Created by madhavchhura on 4/20/15.
@@ -46,20 +45,13 @@ public class FragmentDrawer extends Fragment {
     private static String[] titles = null;
     private static TypedArray imageView = null;
     private FragmentDrawerListener drawerListener;
-    private Bitmap profilePicture;
     private ImageView profileImageView, editImageView;
     private TextView nameTextView;
-    private User mCurrentUser;
 
 
 
     public FragmentDrawer() {
 
-    }
-
-    public FragmentDrawer(User user) {
-        this.mCurrentUser = user;
-        this.profilePicture = user.getUserProfilePicture();
     }
 
     public void setDrawerListener(FragmentDrawerListener listener) {
@@ -83,10 +75,10 @@ public class FragmentDrawer extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // drawer labels
         titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
         imageView = getActivity().getResources().obtainTypedArray(R.array.nav_drawer_icons);
-
     }
 
     @Override
@@ -103,21 +95,16 @@ public class FragmentDrawer extends Fragment {
         editImageView = (ImageView) layout.findViewById(R.id.editImage);
         nameTextView = (TextView) layout.findViewById(R.id.name);
 
-        if(profilePicture != null){
-            profileImageView.setImageBitmap(profilePicture);
-        }
-        nameTextView.setText(ParseUser.getCurrentUser().getUsername());
+        Picasso.with(getActivity())
+                .load(ParseUser.getCurrentUser().getParseFile("userImage").getUrl())
+                .into(profileImageView);
+
+        nameTextView.setText(Profile.getCurrentProfile().getName());
         editImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerListener.onDrawerItemSelected(v, -1);
                 mDrawerLayout.closeDrawer(containerView);
-                if (profilePicture != null) {
-                    profileImageView.setImageBitmap(profilePicture);
-                }
-                else{
-                    profileImageView.setImageResource(R.drawable.ic_profile);
-                }
             }
         });
 
@@ -128,9 +115,7 @@ public class FragmentDrawer extends Fragment {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-
                     Log.d("In on Click", "image view is clicked");
-                    //Fragment settings = new SettingsFragment();
 
                 drawerListener.onDrawerItemSelected(view, position);
                 mDrawerLayout.closeDrawer(containerView);
@@ -144,12 +129,10 @@ public class FragmentDrawer extends Fragment {
 
         return layout;
     }
-    public void setProfileImageView(Bitmap picture){
-        Log.d("Set Profile Image View", "" + profileImageView);
-        profileImageView.setImageBitmap(picture);
-        Log.d("Set Profile Image View", "" + profileImageView);
-    }
 
+    public void setProfileImageView(Bitmap picture){
+        profileImageView.setImageBitmap(picture);
+    }
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, final Toolbar toolbar) {
         containerView = getActivity().findViewById(fragmentId);
@@ -229,7 +212,7 @@ public class FragmentDrawer extends Fragment {
     }
 
     public interface FragmentDrawerListener {
-        public void onDrawerItemSelected(View view, int position);
+       void onDrawerItemSelected(View view, int position);
     }
 
 
