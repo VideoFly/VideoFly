@@ -1,17 +1,22 @@
 package example.com.videofly;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -19,15 +24,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.Profile;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
+import com.parse.FindCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -39,9 +51,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 
 import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
@@ -50,13 +64,17 @@ import example.com.videofly.fragments.MessagesFragment;
 import example.com.videofly.fragments.SettingsFragment;
 import example.com.videofly.slidingmenu.FragmentDrawer;
 
-public class MainActivity extends ActionBarActivity implements FragmentDrawer.FragmentDrawerListener {
+public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
-    public  User user;
+    private  User user, temp;
     private JSONObject usr;
-    private Bitmap bitmap;
+    private Bitmap imgBitmap = null;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int RESULT_LOAD_IMG = 0;
+    final int MAX_IMAGE_DIMENSION = (int) (96 * Resources.getSystem().getDisplayMetrics().density);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +83,9 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
 
         user = new User();
         makeMeRequest();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     private void createDisplay() {
@@ -76,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        drawerFragment = new FragmentDrawer(bitmap);
+        drawerFragment = new FragmentDrawer(user);
         drawerFragment = (FragmentDrawer)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
@@ -84,6 +102,23 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
 
         // display the first navigation drawer view on app launch
         displayView(0);
+    }
+
+    class getUserInformation extends AsyncTask<Void, Void, Void>
+    {
+        protected Void doInBackground(Void... arg0) {
+            Log.d("DoINBackGround","On doInBackground...");
+            user.setUser_fb_id(ParseUser.getCurrentUser().getString("fb_id"));
+            user.setUserName(ParseUser.getCurrentUser().getUsername());
+            user.setUserEmail(ParseUser.getCurrentUser().getEmail());
+            user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
     }
 
     class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
@@ -108,8 +143,6 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
                         usr = object;
                         updateUserData();
                         fbFriendsRequest();
-                        //bitmap = userPic();
-                        //user.setUserProfilePicture(bitmap);
                     }
                 });
         Bundle parameters = new Bundle();
@@ -134,38 +167,59 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         user.setUser_fb_id(usr.optString("id"));
         user.setUserName(usr.optString("name"));
         user.setUserEmail(usr.optString("email"));
+        user.setUserImage(uploadImageFile(
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile)));
 
         ParseUser.getCurrentUser().saveInBackground();
     }
 
-    private Bitmap userPic() {
+    private ParseFile uploadImageFile(Bitmap image) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        ParseFile parseFile = new ParseFile(user.getUser_fb_id()+".png", byteArray);
 
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response;
-        try {
-            URL url = new URL("http://graph.facebook.com/"
-                    + Profile.getCurrentProfile().getId()+ "/picture");
-            HttpGet request = new HttpGet(String.valueOf(url));
-            response = client.execute(request);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
-            InputStream inputStream = bufferedEntity.getContent();
-            bitmap = BitmapFactory.decodeStream(inputStream);
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return bitmap;
+        parseFile.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.d("Error Saving",e.getMessage());
+                    Toast.makeText(getApplicationContext(), "Error Saving" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        return parseFile;
     }
+
+//    private Bitmap userPic() {
+//
+//        HttpClient client = new DefaultHttpClient();
+//        HttpResponse response;
+//        try {
+//            URL url = new URL("http://icons.webpatashala.com/" +
+//                    "icons/Face-Avatars-Icons/Png/" +
+//                    "Male-Face-L3-icon-2013103.PNG");
+//            HttpGet request = new HttpGet(String.valueOf(url));
+//            response = client.execute(request);
+//            HttpEntity entity = response.getEntity();
+//            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
+//            InputStream inputStream = bufferedEntity.getContent();
+//            bitmap = BitmapFactory.decodeStream(inputStream);
+//        } catch (ClientProtocolException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        return bitmap;
+//    }
 
     @Override
     public void onDrawerItemSelected(View view, int position) {
-        if(view.equals(findViewById(R.id.editImage))){
-            position = 3;
-        }
+//        if(view.equals(findViewById(R.id.editImage))){
+//            position = 3;
+//        }
         displayView(position);
     }
 
@@ -173,6 +227,8 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         switch (position) {
+            case -1:
+                changeProfilePicture();
             case 0:
                 fragment = new HomeFragment(user);
                 title = getString(R.string.title_home);
@@ -207,6 +263,46 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
             getSupportActionBar().setTitle(title);
         }
     }
+
+    private void changeProfilePicture() {
+        new MaterialDialog.Builder(this)
+                .callback(new MaterialDialog.ButtonCallback(){
+                    @Override
+                    public void onPositive(MaterialDialog dialog){
+                        dispatchTakePictureIntent();
+                    }
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                        loadImagefromGallery();
+                    }
+
+                    @Override
+                    public void onNeutral(MaterialDialog dialog) {
+                    }
+                })
+                .title("SET A PROFILE PICTURE")
+                .content("Select one of the following")
+                .positiveText("Take Photo")
+                .negativeText("Choose From Library")
+                .neutralText("Remove Current Photo")
+                .autoDismiss(true)
+                .show();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+    public void loadImagefromGallery() {
+        // Create intent to Open Image applications like Gallery, Google Photos
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        // Start the Intent
+        startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
+    }
+
 
     private void logout(){
         if(ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
@@ -270,6 +366,94 @@ public class MainActivity extends ActionBarActivity implements FragmentDrawer.Fr
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Log.d("In on Acitivity Result", "creating new Fragment Drawer");
+            Bundle extras = data.getExtras();
+            imgBitmap = (Bitmap) extras.get("data");
+            user.setUserProfilePicture(imgBitmap);
+            drawerFragment.setProfileImageView(imgBitmap);
+        }
+        else if(requestCode == RESULT_LOAD_IMG && resultCode == RESULT_OK){
+            Uri selectedImage = data.getData();
+            try {
+                imgBitmap = scaleImage(this,selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            user.setUserProfilePicture(imgBitmap);
+            drawerFragment.setProfileImageView(imgBitmap);
+        }
         ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private Bitmap scaleImage(Context context, Uri photoUri) throws IOException {
+        InputStream is = context.getContentResolver().openInputStream(photoUri);
+        BitmapFactory.Options dbo = new BitmapFactory.Options();
+        dbo.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, dbo);
+        is.close();
+
+        int rotatedWidth, rotatedHeight;
+        int orientation = getOrientation(context, photoUri);
+
+        if (orientation == 90 || orientation == 270) {
+            rotatedWidth = dbo.outHeight;
+            rotatedHeight = dbo.outWidth;
+        } else {
+            rotatedWidth = dbo.outWidth;
+            rotatedHeight = dbo.outHeight;
+        }
+
+        Bitmap srcBitmap;
+        is = context.getContentResolver().openInputStream(photoUri);
+        if (rotatedWidth > MAX_IMAGE_DIMENSION || rotatedHeight > MAX_IMAGE_DIMENSION) {
+            float widthRatio = ((float) rotatedWidth) / ((float) MAX_IMAGE_DIMENSION);
+            float heightRatio = ((float) rotatedHeight) / ((float) MAX_IMAGE_DIMENSION);
+            float maxRatio = Math.max(widthRatio, heightRatio);
+
+            // Create the bitmap from file
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = (int) maxRatio;
+            srcBitmap = BitmapFactory.decodeStream(is, null, options);
+        } else {
+            srcBitmap = BitmapFactory.decodeStream(is);
+        }
+        is.close();
+
+        /*
+         * if the orientation is not 0 (or -1, which means we don't know), we
+         * have to do a rotation.
+         */
+        if (orientation > 0) {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+
+            srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                    srcBitmap.getHeight(), matrix, true);
+        }
+
+        String type = context.getContentResolver().getType(photoUri);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if (type.equals("image/png")) {
+            srcBitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        } else if (type.equals("image/jpg") || type.equals("image/jpeg")) {
+            srcBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        }
+        byte[] bMapArray = baos.toByteArray();
+        baos.close();
+        return BitmapFactory.decodeByteArray(bMapArray, 0, bMapArray.length);
+    }
+
+    private int getOrientation(Context context, Uri photoUri) {
+        /* it's on the external media. */
+        Cursor cursor = context.getContentResolver().query(photoUri,
+                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+        if (cursor.getCount() != 1) {
+            return -1;
+        }
+
+        cursor.moveToFirst();
+        return cursor.getInt(0);
     }
 }

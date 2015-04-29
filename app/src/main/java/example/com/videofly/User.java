@@ -19,13 +19,13 @@ import java.util.ArrayList;
 /**
  * Created by madhavchhura on 4/21/15.
  */
-@ParseClassName("ParseUser")
-public class User extends ParseObject {
+
+public class User {
 
     private Bitmap userProfilePicture;
     private String userName;
     private String userEmail;
-    private ParseFile profileImage;
+    private ParseFile userImage;
     private ArrayList<Friends> userFriends;
     private String user_fb_id;
 
@@ -73,13 +73,13 @@ public class User extends ParseObject {
         parseUser.put("fb_id", user_fb_id);
     }
 
-    public ParseFile getProfileImage(){
-        return getParseFile("profileImage");
+    public ParseFile getUserImage(){
+        return userImage;
     }
 
-    public void setProfileImage(ParseFile profileImage) {
-        this.profileImage = profileImage;
-        put("profileImage", profileImage);
+    public void setUserImage(ParseFile profileImage) {
+        this.userImage = profileImage;
+        parseUser.put("userImage", profileImage);
     }
     public ArrayList<Friends> getUserFriends() {
         return userFriends;
@@ -97,6 +97,6 @@ public class User extends ParseObject {
                 }
             }
         }
-        put("friends",userFriends);
+        //put("friends",userFriends);
     }
 }
