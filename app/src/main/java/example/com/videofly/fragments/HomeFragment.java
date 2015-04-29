@@ -23,7 +23,6 @@ import example.com.videofly.User;
 public class HomeFragment extends Fragment {
 
     User userProfile;
-    Bitmap bitmap;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -34,9 +33,6 @@ public class HomeFragment extends Fragment {
         userProfile = user;
     }
 
-    public HomeFragment(Bitmap bitmap){
-        this.bitmap = bitmap;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

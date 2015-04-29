@@ -95,9 +95,14 @@ public class FragmentDrawer extends Fragment {
         editImageView = (ImageView) layout.findViewById(R.id.editImage);
         nameTextView = (TextView) layout.findViewById(R.id.name);
 
-        Picasso.with(getActivity())
-                .load(ParseUser.getCurrentUser().getParseFile("userImage").getUrl())
-                .into(profileImageView);
+        if(ParseUser.getCurrentUser().getParseFile("userImage") == null){
+            profileImageView.setImageResource(R.drawable.ic_profile);
+        }
+        else {
+            Picasso.with(getActivity())
+                    .load(ParseUser.getCurrentUser().getParseFile("userImage").getUrl())
+                    .into(profileImageView);
+        }
 
         nameTextView.setText(Profile.getCurrentProfile().getName());
         editImageView.setOnClickListener(new View.OnClickListener() {
