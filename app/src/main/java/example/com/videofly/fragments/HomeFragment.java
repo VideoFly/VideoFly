@@ -1,6 +1,7 @@
 package example.com.videofly.fragments;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -9,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.facebook.Profile;
+import com.squareup.picasso.Picasso;
 
 import example.com.videofly.R;
 import example.com.videofly.User;
@@ -19,6 +23,7 @@ import example.com.videofly.User;
 public class HomeFragment extends Fragment {
 
     User userProfile;
+    Bitmap bitmap;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -27,6 +32,10 @@ public class HomeFragment extends Fragment {
 
     public HomeFragment(User user) {
         userProfile = user;
+    }
+
+    public HomeFragment(Bitmap bitmap){
+        this.bitmap = bitmap;
     }
 
     @Override
@@ -40,15 +49,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         TextView homeText = (TextView) rootView.findViewById(R.id.label);
-        ImageView imageView = (ImageView) rootView.findViewById(R.id.pic);
-
-        //For Test Purposes.
-        imageView.setImageBitmap(userProfile.getUserProfilePicture());
-
-
-        Log.d("In OnCreateView", ""+userProfile.getUserName()+"");
         homeText.setText(userProfile.getUserName());
-
         // Inflate the layout for this fragment
         return rootView;
     }

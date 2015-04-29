@@ -1,9 +1,9 @@
 package example.com.videofly.slidingmenu;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -20,14 +20,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.Profile;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import example.com.videofly.R;
 import example.com.videofly.User;
-import example.com.videofly.fragments.SettingsFragment;
 
 /**
  * Created by madhavchhura on 4/20/15.
@@ -46,14 +47,19 @@ public class FragmentDrawer extends Fragment {
     private static TypedArray imageView = null;
     private FragmentDrawerListener drawerListener;
     private Bitmap profilePicture;
+    private ImageView profileImageView, editImageView;
+    private TextView nameTextView;
+    private User mCurrentUser;
+
 
 
     public FragmentDrawer() {
 
     }
 
-    public FragmentDrawer(Bitmap bitmap) {
-        this.profilePicture = bitmap;
+    public FragmentDrawer(User user) {
+        this.mCurrentUser = user;
+        this.profilePicture = user.getUserProfilePicture();
     }
 
     public void setDrawerListener(FragmentDrawerListener listener) {
@@ -77,38 +83,45 @@ public class FragmentDrawer extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // drawer labels
         titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
         imageView = getActivity().getResources().obtainTypedArray(R.array.nav_drawer_icons);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // drawer labels
+        titles = getActivity().getResources().getStringArray(R.array.nav_drawer_labels);
+        imageView = getActivity().getResources().obtainTypedArray(R.array.nav_drawer_icons);
+
+        Log.d("I AM ON ", "ON CREATE VIEW")  ;
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
-        ImageView profileImageView = (ImageView)layout.findViewById(R.id.profile_image);
-        final ImageView editImageView = (ImageView) layout.findViewById(R.id.editImage);
-        TextView nameTextView = (TextView) layout.findViewById(R.id.name);
-        nameTextView.setText(ParseUser.getCurrentUser().getUsername());
+        profileImageView = (ImageView)layout.findViewById(R.id.profile_image);
+        editImageView = (ImageView) layout.findViewById(R.id.editImage);
+        nameTextView = (TextView) layout.findViewById(R.id.name);
 
+        if(profilePicture != null){
+            profileImageView.setImageBitmap(profilePicture);
+        }
+        nameTextView.setText(ParseUser.getCurrentUser().getUsername());
         editImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawerListener.onDrawerItemSelected(v,3);
+                drawerListener.onDrawerItemSelected(v, -1);
                 mDrawerLayout.closeDrawer(containerView);
+                if (profilePicture != null) {
+                    profileImageView.setImageBitmap(profilePicture);
+                }
+                else{
+                    profileImageView.setImageResource(R.drawable.ic_profile);
+                }
             }
         });
 
-
-        // ** Doesnt Work unable to display pic
-        // headImage.setImageBitmap(profilePicture);
-
-
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
-
-
         adapter = new NavigationDrawerAdapter(getActivity(), getData());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -131,8 +144,11 @@ public class FragmentDrawer extends Fragment {
 
         return layout;
     }
-
-
+    public void setProfileImageView(Bitmap picture){
+        Log.d("Set Profile Image View", "" + profileImageView);
+        profileImageView.setImageBitmap(picture);
+        Log.d("Set Profile Image View", "" + profileImageView);
+    }
 
 
     public void setUp(int fragmentId, DrawerLayout drawerLayout, final Toolbar toolbar) {
@@ -215,5 +231,13 @@ public class FragmentDrawer extends Fragment {
     public interface FragmentDrawerListener {
         public void onDrawerItemSelected(View view, int position);
     }
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
 
 }
