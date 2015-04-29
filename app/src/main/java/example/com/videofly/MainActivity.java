@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         parseFile.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                Toast.makeText(getApplicationContext(), "DONE", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Image Changed", Toast.LENGTH_LONG).show();
                 if (e != null) {
                     Log.d("Error Saving", e.getMessage());
                     Toast.makeText(getApplicationContext(), "Error Saving" + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
                     @Override
                     public void onNeutral(MaterialDialog dialog) {
+                        removeProfileImage();
                     }
                 })
                 .title("SET A PROFILE PICTURE")
@@ -247,6 +248,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 .neutralText("Remove Current Photo")
                 .autoDismiss(true)
                 .show();
+    }
+
+    private void removeProfileImage() {
+        imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
+        user.setUserImage(uploadImageFile(imgBitmap));
+        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                drawerFragment.setProfileImageView(imgBitmap);
+            }
+        });
     }
 
     private void dispatchTakePictureIntent() {
