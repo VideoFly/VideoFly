@@ -5,6 +5,7 @@
     //Permissions this app uses.
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:name="example.com.videofly.Application"
@@ -33,13 +34,13 @@
         </activity>
         <activity
             android:name=".login"
-            android:label="@string/title_activity_login"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:label="@string/title_activity_login">
         </activity>
         <activity
             android:name=".splash"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:clearTaskOnLaunch="true"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

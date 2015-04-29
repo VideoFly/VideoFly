@@ -1,26 +1,31 @@
 package example.com.videofly;
 
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 
+
+import com.parse.ParseClassName;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
+
 import java.util.ArrayList;
 
 
 /**
  * Created by madhavchhura on 4/21/15.
  */
-public class User {
+@ParseClassName("ParseUser")
+public class User extends ParseObject {
 
     private Bitmap userProfilePicture;
     private String userName;
     private String userEmail;
+    private ParseFile profileImage;
     private ArrayList<Friends> userFriends;
     private String user_fb_id;
 
@@ -68,6 +73,14 @@ public class User {
         parseUser.put("fb_id", user_fb_id);
     }
 
+    public ParseFile getProfileImage(){
+        return getParseFile("profileImage");
+    }
+
+    public void setProfileImage(ParseFile profileImage) {
+        this.profileImage = profileImage;
+        put("profileImage", profileImage);
+    }
     public ArrayList<Friends> getUserFriends() {
         return userFriends;
     }
@@ -84,5 +97,6 @@ public class User {
                 }
             }
         }
+        put("friends",userFriends);
     }
 }

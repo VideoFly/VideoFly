@@ -1,9 +1,8 @@
 package example.com.videofly;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class login extends ActionBarActivity{
+public class login extends AppCompatActivity{
 
     private ImageButton mLoginButton;
 

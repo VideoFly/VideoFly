@@ -1,8 +1,10 @@
 package example.com.videofly;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
@@ -55,12 +57,14 @@ public class splash extends Activity {
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
         anim.reset();
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.splashLinLay);
+        layout.setBackground(getDrawable(R.color.colorPrimaryDark));
         layout.clearAnimation();
         layout.startAnimation(anim);
 
         anim = AnimationUtils.loadAnimation(this, R.anim.translate);
         anim.reset();
         ImageView imageView = (ImageView) findViewById(R.id.logo);
+        imageView.setBackground(getDrawable(R.drawable.appicon));
         imageView.clearAnimation();
         imageView.startAnimation(anim);
 
@@ -74,12 +78,16 @@ public class splash extends Activity {
             public void onAnimationEnd(Animation animation) {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 if(currentUser != null && (ParseFacebookUtils.isLinked(currentUser))){
+                    finish();
                     Intent i = new Intent(splash.this, MainActivity.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                     finish();
                 }
                 else{
+                    finish();
                     Intent i = new Intent(splash.this, login.class);
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(i);
                     finish();
                 }
