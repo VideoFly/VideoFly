@@ -49,7 +49,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         TextView homeText = (TextView) rootView.findViewById(R.id.label);
-        homeText.setText(userProfile.getUserName());
+        homeText.setText(Profile.getCurrentProfile().getName());
         // Inflate the layout for this fragment
         return rootView;
     }
