@@ -1,6 +1,8 @@
 package example.com.videofly.friendscards;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 
@@ -11,6 +13,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import example.com.videofly.Friends;
@@ -56,13 +63,18 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
         Log.d("Friends View Holder", "Assigning Friends values");
         holder.personName.setText(friendsList.get(position).getName());
         holder.personId.setText(friendsList.get(position).getId());
-        holder.personPhoto.setImageBitmap(friendsList.get(position).getProfilePic());
+        holder.personPhoto.setImageBitmap(friendsList.get(position).getFriendImage());
+
+        //Picasso.with(holder.personPhoto.getContext()).load(friendsList.get(position).getFriendImage().getUrl()).into(holder.personPhoto);
+
+
     }
 
     @Override
     public int getItemCount() {
         return friendsList.size();
     }
+
 
 
 }

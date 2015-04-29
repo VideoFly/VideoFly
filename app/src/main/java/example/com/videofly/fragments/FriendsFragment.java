@@ -31,7 +31,7 @@ public class FriendsFragment extends Fragment {
     }
 
     public FriendsFragment(ArrayList<Friends> friends){
-        data = friends;
+        this.data = friends;
     }
 
 

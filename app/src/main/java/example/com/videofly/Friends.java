@@ -2,21 +2,19 @@ package example.com.videofly;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
-import com.facebook.Profile;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by madhavchhura on 4/22/15.
@@ -24,13 +22,13 @@ import java.util.ArrayList;
 public class Friends {
     private String name;
     private String id;
-    private Bitmap profilePic;
-    private ArrayList<Friends> friendsArrayList;
+    private ParseFile friendImage;
+    private Bitmap bitmap;
 
     Friends(String name, String id) {
         this.name = name;
         this.id = id;
-        this.setProfilePic(id);
+        this.setFriendImage(id);
     }
 
     public String getName() {
@@ -49,37 +47,27 @@ public class Friends {
         this.id = id;
     }
 
-    public Bitmap getProfilePic() {
-
-        return profilePic;
-    }
-
-    public void setProfilePic(String id) {
-        this.profilePic = userPic(id);
-    }
-
-    private Bitmap userPic(String id) {
-        Bitmap bitmap = null;
-        HttpClient client = new DefaultHttpClient();
-        HttpResponse response;
-        try {
-            URL url = new URL("http://graph.facebook.com/"
-                    + id + "/picture");
-            HttpGet request = new HttpGet(String.valueOf(url));
-            response = client.execute(request);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity bufferedEntity = new BufferedHttpEntity(entity);
-            InputStream inputStream = bufferedEntity.getContent();
-            bitmap = BitmapFactory.decodeStream(inputStream);
-        } catch (ClientProtocolException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public Bitmap getFriendImage() {
         return bitmap;
     }
-
-
+    public void setFriendImage(String id){
+        ParseQuery<ParseUser> query = ParseUser.getQuery();
+        query.whereEqualTo("fb_id", id);
+        try {
+            List<ParseUser> list = query.find();
+            for(ParseObject user : list){
+                this.friendImage = user.getParseFile("userImage");
+                Log.d("URL OF THE FRIEND IMAGE", friendImage.getUrl());
+                URL url = new URL(friendImage.getUrl());
+                bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
