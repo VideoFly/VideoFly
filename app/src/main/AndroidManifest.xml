@@ -12,10 +12,6 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
-    <!--
-  IMPORTANT: Change "com.parse.tutorials.pushnotifications.permission.C2D_MESSAGE" in the lines below
-  to match your app's package name + ".permission.C2D_MESSAGE".
--->
     <permission android:protectionLevel="signature"
         android:name="example.com.videofly.permission.C2D_MESSAGE" />
     <uses-permission android:name="example.com.videofly.permission.C2D_MESSAGE" />

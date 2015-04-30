@@ -30,6 +30,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.parse.bolts:bolts-android:1.+'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+    compile fileTree(dir: 'libs', include: 'opentok-android-sdk-2.5.0.jar')
     compile 'com.facebook.android:facebook-android-sdk:4.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'de.hdodenhof:circleimageview:1.2.2'
