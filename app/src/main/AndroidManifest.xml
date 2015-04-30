@@ -87,7 +87,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/appicon"/>
+        <meta-data android:name="com.parse.push.notification_icon" android:resource="@drawable/ic_stat_name"/>
     </application>
 
 </manifest>
