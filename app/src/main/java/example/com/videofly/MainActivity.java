@@ -75,6 +75,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     }
 
+    private void saveSessionToParse(String session){
+
+    }
+
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
