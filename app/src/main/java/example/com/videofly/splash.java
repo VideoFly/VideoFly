@@ -1,10 +1,8 @@
 package example.com.videofly;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
@@ -57,14 +55,13 @@ public class splash extends Activity {
         Animation anim = AnimationUtils.loadAnimation(this, R.anim.alpha);
         anim.reset();
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.splashLinLay);
-        layout.setBackground(getDrawable(R.color.colorPrimaryDark));
         layout.clearAnimation();
         layout.startAnimation(anim);
 
         anim = AnimationUtils.loadAnimation(this, R.anim.translate);
         anim.reset();
         ImageView imageView = (ImageView) findViewById(R.id.logo);
-        imageView.setBackground(getDrawable(R.drawable.appicon));
+        imageView.setImageResource(R.drawable.appicon);
         imageView.clearAnimation();
         imageView.startAnimation(anim);
 
