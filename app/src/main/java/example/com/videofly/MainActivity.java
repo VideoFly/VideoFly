@@ -30,9 +30,14 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
+import com.parse.FunctionCallback;
+import com.parse.Parse;
+import com.parse.ParseACL;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -42,6 +47,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
@@ -72,11 +78,46 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         user = new User();
         makeMeRequest();
 
-
     }
 
-    private void saveSessionToParse(String session){
 
+    private ParseObject object;
+    //private String objectId = null;
+    private void saveSessionToParse(){
+
+        object = ParseObject.create("Broadcast");
+        object.put("owner",ParseUser.getCurrentUser());
+        ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
+        acl.setPublicReadAccess(true);
+        object.setACL(acl);
+        object.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                isBroadcastOwner();
+                saveToken();
+            }
+        });
+    }
+    private boolean isBroadcastOwner (){
+        if(object.get("owner").equals(ParseUser.getCurrentUser())){
+            Log.d("Check Owner", "This is the owner");
+            return true;
+        }
+        return false;
+    }
+    private void saveToken(){
+
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("broadcast",object.getObjectId());
+        ParseCloud.callFunctionInBackground("getBroadcastToken", params, new FunctionCallback<String>() {
+            public void done(String response, ParseException e) {
+                if (e == null) {
+                    Log.d("Cloud Response", "There were no exceptions! " + response);
+                } else {
+                    Log.d("Cloud Response", "Exception: " + response + e);
+                }
+            }
+        });
     }
 
     private void createDisplay() {
@@ -100,19 +141,19 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
 
-    class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
-    {
-        protected Void doInBackground(JSONArray... arg0) {
-            Log.d("DoINBackGround","On doInBackground...");
-            user.setUserFriends(arg0[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
+class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
+{
+    protected Void doInBackground(JSONArray... arg0) {
+        Log.d("DoINBackGround","On doInBackground...");
+        user.setUserFriends(arg0[0]);
+        return null;
     }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+    }
+}
 
     private void makeMeRequest() {
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
@@ -155,7 +196,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         else{
             user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
         }
+
         ParseUser.getCurrentUser().saveInBackground();
+        saveSessionToParse();
+
+        //saveSessionToParse();
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
