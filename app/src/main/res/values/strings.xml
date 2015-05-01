@@ -7,6 +7,7 @@
     <string name="title_activity_splash">splash</string>
     <string name="appIcon">App Icon</string>
     <string name="facebook_app_id">743914899061568</string>
+    <string name="opentok_api_key">45220792</string>
     <string name="appID"></string>
     <string name="login">Login</string>
     <string name="action_search">Search</string>

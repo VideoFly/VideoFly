@@ -31,7 +31,6 @@ import com.facebook.GraphResponse;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
 import com.parse.FunctionCallback;
-import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
@@ -64,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private JSONObject usr;
     private Bitmap imgBitmap = null;
     private ParseObject broadcastObject;
+    public static String sessionId;
+    public static String token;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int RESULT_LOAD_IMG = 0;
     final int MAX_IMAGE_DIMENSION = (int) (96 * Resources.getSystem().getDisplayMetrics().density);
@@ -107,13 +108,12 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         if(ParseUser.getCurrentUser().isNew()){
             imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
             user.setUserImage(uploadImageFile(imgBitmap));
-            ParseUser.getCurrentUser().saveInBackground();
-            saveSessionToParse();
         }
-        else{
+        else {
             user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
-            ParseUser.getCurrentUser().saveInBackground();
         }
+        ParseUser.getCurrentUser().saveInBackground();
+        saveSessionToParse();
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
@@ -468,7 +468,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             @Override
             public void done(ParseException e) {
                 isBroadcastOwner();
-                saveToken();
+                saveTokeToCloud();
             }
         });
     }
@@ -478,16 +478,18 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
      * is used to generate unique OpenTokek sessionId, and tokens for the
      * current logged in user.
      */
-    private void saveToken(){
+    private void saveTokeToCloud(){
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("broadcast", broadcastObject.getObjectId());
         ParseCloud.callFunctionInBackground("getBroadcastToken", params, new FunctionCallback<String>() {
             public void done(String response, ParseException e) {
                 if (e == null) {
                     Log.d("Cloud Response", "There were no exceptions! " + response);
+                    token = response;
                     broadcastObject.put("publisherToken", response);
                     broadcastObject.put("subscriberToken", response);
                     broadcastObject.saveInBackground();
+                    sessionId = broadcastObject.getString("sessionId");
                 } else {
                     Log.d("Cloud Response", "Exception: " + response + e);
                 }

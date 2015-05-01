@@ -5,13 +5,6 @@
     android:orientation="vertical"
     tools:context="example.com.activity.HomeFragment">
 
-    <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:id="@+id/pic"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
-
     <TextView
         android:id="@+id/label"
         android:layout_alignParentTop="true"
@@ -23,16 +16,12 @@
         android:text="HOME"
         android:textStyle="bold"/>
 
-    <TextView
-        android:layout_below="@id/label"
-        android:layout_centerInParent="true"
-        android:layout_width="fill_parent"
+    <Button
+        android:id="@+id/callButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12dp"
-        android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
-        android:text="Working on pulling the User Profile from Facebook" />
-
-
+        android:text="Test Video Call"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
