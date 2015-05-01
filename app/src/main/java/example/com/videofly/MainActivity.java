@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private  User user;
     private JSONObject usr;
     private Bitmap imgBitmap = null;
+    private ParseObject broadcastObject;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int RESULT_LOAD_IMG = 0;
     final int MAX_IMAGE_DIMENSION = (int) (96 * Resources.getSystem().getDisplayMetrics().density);
@@ -73,53 +74,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         user = new User();
         makeMeRequest();
 
     }
-
-
-    private ParseObject object;
-    //private String objectId = null;
-    private void saveSessionToParse(){
-
-        object = ParseObject.create("Broadcast");
-        object.put("owner",ParseUser.getCurrentUser());
-        ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
-        acl.setPublicReadAccess(true);
-        object.setACL(acl);
-        object.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                isBroadcastOwner();
-                saveToken();
-            }
-        });
-    }
-    private boolean isBroadcastOwner (){
-        if(object.get("owner").equals(ParseUser.getCurrentUser())){
-            Log.d("Check Owner", "This is the owner");
-            return true;
-        }
-        return false;
-    }
-    private void saveToken(){
-
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        params.put("broadcast",object.getObjectId());
-        ParseCloud.callFunctionInBackground("getBroadcastToken", params, new FunctionCallback<String>() {
-            public void done(String response, ParseException e) {
-                if (e == null) {
-                    Log.d("Cloud Response", "There were no exceptions! " + response);
-                } else {
-                    Log.d("Cloud Response", "Exception: " + response + e);
-                }
-            }
-        });
-    }
-
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -140,49 +98,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         displayView(0);
     }
 
-
-class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
-{
-    protected Void doInBackground(JSONArray... arg0) {
-        Log.d("DoINBackGround","On doInBackground...");
-        user.setUserFriends(arg0[0]);
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-    }
-}
-
-    private void makeMeRequest() {
-        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONObjectCallback() {
-                    @Override
-                    public void onCompleted(JSONObject object, GraphResponse response) {
-                        usr = object;
-                        updateUserData();
-                        fbFriendsRequest();
-                    }
-                });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email");
-        request.setParameters(parameters);
-        request.executeAsync();
-    }
-    private void fbFriendsRequest(){
-        GraphRequest request = GraphRequest.newMyFriendsRequest(
-                AccessToken.getCurrentAccessToken(),
-                new GraphRequest.GraphJSONArrayCallback() {
-                    @Override
-                    public void onCompleted(final JSONArray jsonArray, GraphResponse graphResponse) {
-                        new getFriendsAsync().execute(jsonArray);
-                        createDisplay();
-                    }
-                });
-        request.executeAsync();
-    }
-
     private void updateUserData() {
         user.setUser_fb_id(usr.optString("id"));
         user.setUserName(usr.optString("name"));
@@ -192,15 +107,13 @@ class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
         if(ParseUser.getCurrentUser().isNew()){
             imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
             user.setUserImage(uploadImageFile(imgBitmap));
+            ParseUser.getCurrentUser().saveInBackground();
+            saveSessionToParse();
         }
         else{
             user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
+            ParseUser.getCurrentUser().saveInBackground();
         }
-
-        ParseUser.getCurrentUser().saveInBackground();
-        saveSessionToParse();
-
-        //saveSessionToParse();
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
@@ -225,9 +138,6 @@ class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
 
     @Override
     public void onDrawerItemSelected(View view, int position) {
-//        if(view.equals(findViewById(R.id.editImage))){
-//            position = 3;
-//        }
         displayView(position);
     }
 
@@ -324,7 +234,6 @@ class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
             }
         });
     }
-
 
     private void logout(){
         if(ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
@@ -479,5 +388,124 @@ class getFriendsAsync extends AsyncTask<JSONArray, Void, Void>
 
         cursor.moveToFirst();
         return cursor.getInt(0);
+    }
+
+
+    /*
+    * Methods below are used to make Facebook API graph requests.
+    **/
+
+    /**
+     * makeMeRequest is used to get current logged in users
+     * profile information.
+     */
+    private void makeMeRequest() {
+        GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        usr = object;
+                        updateUserData();
+                        fbFriendsRequest();
+                    }
+                });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,email");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+    /**
+     *  This method is used to get get current logged in users
+     *  friends from facebook in a AsyncTask.
+     **/
+    private void fbFriendsRequest(){
+        GraphRequest request = GraphRequest.newMyFriendsRequest(
+                AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONArrayCallback() {
+                    @Override
+                    public void onCompleted(final JSONArray jsonArray, GraphResponse graphResponse) {
+                        new getFriendsAsync().execute(jsonArray);
+                        createDisplay();
+                    }
+                });
+        request.executeAsync();
+    }
+    /** Class Description of getFriendsAsync
+     *  AsyncTask to get users friends from facebook.
+     **/
+    class getFriendsAsync extends AsyncTask<JSONArray, Void, Void> {
+        protected Void doInBackground(JSONArray... arg0) {
+            Log.d("DoINBackGround","On doInBackground...");
+            user.setUserFriends(arg0[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
+
+    /*
+    * Methods below are used to generate OpenTok Configurations
+    * using Parse Cloud.
+    **/
+
+    /**
+     * saveSessionToParse creates a new Broadcast object related to the
+     * Parse database class Broadcast. Also sets up a relation between
+     * the current logged in user and the Broadcast Object.
+     */
+    private void saveSessionToParse(){
+
+        broadcastObject = ParseObject.create("Broadcast");
+        broadcastObject.put("owner",ParseUser.getCurrentUser());
+        ParseACL acl = new ParseACL(ParseUser.getCurrentUser());
+        acl.setPublicReadAccess(true);
+        broadcastObject.setACL(acl);
+        broadcastObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                isBroadcastOwner();
+                saveToken();
+            }
+        });
+    }
+
+    /**
+     * saveToken is used to make a request to the ParseCloud. The ParseCloud
+     * is used to generate unique OpenTokek sessionId, and tokens for the
+     * current logged in user.
+     */
+    private void saveToken(){
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("broadcast", broadcastObject.getObjectId());
+        ParseCloud.callFunctionInBackground("getBroadcastToken", params, new FunctionCallback<String>() {
+            public void done(String response, ParseException e) {
+                if (e == null) {
+                    Log.d("Cloud Response", "There were no exceptions! " + response);
+                    broadcastObject.put("publisherToken", response);
+                    broadcastObject.put("subscriberToken", response);
+                    broadcastObject.saveInBackground();
+                } else {
+                    Log.d("Cloud Response", "Exception: " + response + e);
+                }
+            }
+        });
+    }
+
+    /**
+     * isBroadcastOwner is used to check if the broadcast object owner is
+     * the current logged in user.
+     * @return true if current logged in user is the owner of the object
+     * Broadcast in Parse database.
+     */
+    private boolean isBroadcastOwner (){
+        if(broadcastObject.get("owner").equals(ParseUser.getCurrentUser())){
+            Log.d("Check Owner", "This is the owner");
+            return true;
+        }
+        return false;
     }
 }

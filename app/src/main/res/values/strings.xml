@@ -49,6 +49,9 @@
         <item>@drawable/ic_settings</item>
         <item>@drawable/ic_logout</item>
     </array>
+    <string name="title_activity_video_call">VideoCallActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 
 
 </resources>
