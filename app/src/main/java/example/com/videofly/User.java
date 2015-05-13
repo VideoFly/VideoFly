@@ -2,16 +2,13 @@ package example.com.videofly;
 
 import android.graphics.Bitmap;
 
-
-import com.parse.ParseClassName;
 import com.parse.ParseFile;
-import com.parse.ParseObject;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 
 import java.util.ArrayList;
 
@@ -31,7 +28,7 @@ public class User {
 
 
     ParseUser parseUser = ParseUser.getCurrentUser();
-
+    ParseInstallation installation = new ParseInstallation().getCurrentInstallation();
 
     public User() {
 
@@ -53,6 +50,7 @@ public class User {
     public void setUserName(String userName) {
         this.userName = userName;
         parseUser.setUsername(this.userName);
+        installation.put("username",userName);
     }
 
     public String getUserEmail() {
@@ -62,6 +60,7 @@ public class User {
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
         parseUser.setEmail(this.userEmail);
+        installation.put("email",userName);
     }
 
     public String getUser_fb_id() {
@@ -71,6 +70,7 @@ public class User {
     public void setUser_fb_id(String user_fb_id) {
         this.user_fb_id = user_fb_id;
         parseUser.put("fb_id", user_fb_id);
+        installation.put("fb_id",user_fb_id);
     }
 
     public ParseFile getUserImage(){
@@ -98,5 +98,8 @@ public class User {
             }
         }
         //put("friends",userFriends);
+    }
+    public void saveUserToParse(){
+        installation.saveInBackground();
     }
 }
