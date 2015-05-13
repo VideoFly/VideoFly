@@ -36,11 +36,16 @@ import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
+import com.parse.SendCallback;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +60,9 @@ import example.com.videofly.fragments.MessagesFragment;
 import example.com.videofly.fragments.SettingsFragment;
 import example.com.videofly.slidingmenu.FragmentDrawer;
 
-public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
+public class MainActivity extends AppCompatActivity implements
+        FragmentDrawer.FragmentDrawerListener,
+        FriendsFragment.CallFriendListener{
 
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
@@ -77,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         user = new User();
         makeMeRequest();
-
     }
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -108,12 +114,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         if(ParseUser.getCurrentUser().isNew()){
             imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
             user.setUserImage(uploadImageFile(imgBitmap));
+            ParseUser.getCurrentUser().saveInBackground();
         }
-        else {
+        else
             user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
-        }
-        ParseUser.getCurrentUser().saveInBackground();
+
         saveSessionToParse();
+        ParseUser.getCurrentUser().saveInBackground();
+        user.saveUserToParse();
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
@@ -142,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
 
+
+
     private void displayView(int position) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
@@ -153,7 +163,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 title = getString(R.string.title_home);
                 break;
             case 1:
-                fragment = new FriendsFragment(user.getUserFriends());
+                FriendsFragment friendsFragment = new FriendsFragment(user.getUserFriends());
+                friendsFragment.setCallFriendListener(this);
+                fragment = friendsFragment;
                 title = getString(R.string.title_friends);
                 break;
             case 2:
@@ -430,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 });
         request.executeAsync();
     }
+
     /** Class Description of getFriendsAsync
      *  AsyncTask to get users friends from facebook.
      **/
@@ -509,5 +522,37 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onCallFriend(String friendId) {
+        Log.d("MainActivity", "onCallFriend Called " + friendId);
+        JSONObject data = new JSONObject();
+        Log.d("MainActivity", "sessionId: " + sessionId);
+        try {
+            data.put("sessionId",sessionId);
+            data.put("publisherToken",token);
+            data.put("alert", user.getUserName() + " is Video Calling You");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ParsePush parsePush = new ParsePush();
+        parsePush.setData(data);
+        parsePush.setChannel("channel");
+        ParseQuery pQuery = ParseInstallation.getQuery();
+        pQuery.whereEqualTo("fb_id", friendId);
+        final Intent i = new Intent(this, VideoCallActivity.class);
+        i.putExtra("sessionId",sessionId);
+        i.putExtra("publisherToken",token);
+        parsePush.sendDataInBackground(data, pQuery, new SendCallback() {
+            @Override
+            public void done(ParseException e) {
+                startActivity(i);
+            }
+        });
+        //parsePush.sendMessageInBackground(user.getUserName() + " is Video Calling You",pQuery);
+        //Intent i = new Intent(this, VideoCallActivity.class);
+        //startActivity(i);
     }
 }

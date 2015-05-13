@@ -12,6 +12,9 @@
     <string name="login">Login</string>
     <string name="action_search">Search</string>
 
+    <string name="notification">Ongoing call</string>
+    <string name="clearNotificationService">Clear Notification</string>
+
     <!-- Content Description -->
     <string name="title_home">Home</string>
     <string name="title_friends">Friends</string>
@@ -53,6 +56,8 @@
     <string name="title_activity_video_call">VideoCallActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_video_fly">video_fly</string>
+    <string name="title_activity_video_controls">video_controls</string>
 
 
 </resources>
