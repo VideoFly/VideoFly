@@ -26,7 +26,8 @@
         android:id="@+id/publisherview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:keepScreenOn="true">
+        android:keepScreenOn="true"
+        android:layout_marginBottom="5dp">
     </RelativeLayout>
 
 </RelativeLayout>

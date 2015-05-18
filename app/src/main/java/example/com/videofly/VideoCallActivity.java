@@ -1,26 +1,22 @@
 package example.com.videofly;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.NotificationCompat;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -37,7 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import example.com.videofly.services.ClearNotificationService;
+import example.com.videofly.services.VideoFlyService;
 
 
 public class VideoCallActivity extends AppCompatActivity implements
@@ -46,17 +42,15 @@ public class VideoCallActivity extends AppCompatActivity implements
         Subscriber.VideoListener {
 
     private static final String LOGTAG = "VideoCallActivity";
-    private Toolbar mToolbar;
+
+    private String sessionId = null;
+    private String token = null;
     private Session mSession;
     private Publisher mPublisher;
-    private Subscriber mSubscriber;
+    public static Subscriber mSubscriber;
+
     private ArrayList<Stream> mStreams;
     private Handler mHandler = new Handler();
-
-    private WindowManager windowManager;
-    private RelativeLayout videoFlyHead; //Root Layout
-    private ImageButton endCallButton;
-    private LinearLayout mViewGroupLayout;
 
     private RelativeLayout mPublisherViewContainer;
     private RelativeLayout mSubscriberViewContainer;
@@ -65,13 +59,12 @@ public class VideoCallActivity extends AppCompatActivity implements
     private ProgressBar mLoadingSub;
 
     private boolean resumeHasRun = false;
-
     private boolean mIsBound = false;
-    private NotificationCompat.Builder mNotifyBuilder;
-    private NotificationManager mNotificationManager;
+
+
     private ServiceConnection mConnection;
 
-
+    @SuppressLint("WrongViewCast")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,22 +85,36 @@ public class VideoCallActivity extends AppCompatActivity implements
         mSubscriberViewContainer = (RelativeLayout) findViewById(R.id.subscriberview);
         mLoadingSub = (ProgressBar) findViewById(R.id.loadingSpinner);
 
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
         mStreams = new ArrayList<Stream>();
 
+        //final ScaleGestureDetector scaleGestureDetector;
+        //scaleGestureDetector = new ScaleGestureDetector(this,new ScaleListener());
+
+
+
+//        mSubscriberViewContainer.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                scaleGestureDetector.onTouchEvent(event);
+//                return true;
+//            }
+//        });
+
         Intent intent = getIntent();
-        String sessionId = intent.getStringExtra("sessionId");
-        String token = intent.getStringExtra("publisherToken");
+        sessionId = intent.getStringExtra("sessionId");
+        token = intent.getStringExtra("publisherToken");
 
         JSONObject json = null;
 
+
         if(sessionId != null && token != null){
-            Log.d("VideoCallActivity", "Created using MainActivity sessionID and token ID");
+            MainActivity.sessionId = sessionId;
+            MainActivity.token = token;
+            Log.d("VideoCallActivity", "Created using sessionID and token ID");
             sessionConnect(sessionId, token);
         }
         else{
-            Log.d("VideoCallActivity", "Created using MainActivity sessionID and token ID");
+            Log.d("VideoCallActivity", "Created using MainActivity's sessionID and token ID");
             sessionConnect(MainActivity.sessionId, MainActivity.token);
 
         }
@@ -128,107 +135,32 @@ public class VideoCallActivity extends AppCompatActivity implements
     public void onPause() {
         super.onPause();
 
-        //Initialize variables
-        endCallButton = new ImageButton(getApplicationContext());
-        videoFlyHead = new RelativeLayout(getApplicationContext());
-        mStreams = new ArrayList<Stream>();
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Intent notificationIntent = new Intent(this, VideoFlyService.class);
 
-
-        videoFlyHead = (RelativeLayout) LayoutInflater.from(this).
-                inflate(R.layout.activity_video_fly, null, true);
-        //mPublisherViewContainer = (RelativeLayout) videoHead.findViewById(R.id.publisherview);
-        mSubscriberViewContainer.removeAllViews();
-        mSubscriberViewContainer = (RelativeLayout) videoFlyHead.findViewById(R.id.subscriberview);
-        attachSubscriberView(mSubscriber);
-
-        mViewGroupLayout = (LinearLayout) LayoutInflater.from(this).
-                inflate(R.layout.activity_video_controls, null);
-        videoFlyHead.addView(mViewGroupLayout);
-
-        endCallButton = (ImageButton) mViewGroupLayout.findViewById(R.id.button_end_call);
-
-        final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                        |WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                PixelFormat.TRANSLUCENT);
-
-        videoFlyHead.setOnTouchListener(new View.OnTouchListener() {
-            private int initialX;
-            private int initialY;
-            private float initialTouchX;
-            private float initialTouchY;
-
-            //Used to make the Head movable.
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        initialX = params.x;
-                        initialY = params.y;
-                        initialTouchX = event.getRawX();
-                        initialTouchY = event.getRawY();
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
-                        windowManager.updateViewLayout(videoFlyHead, params);
-                        return true;
+        if (mConnection == null) {
+            mConnection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName className, IBinder binder) {
+                    startService(new Intent(getApplicationContext(), VideoFlyService.class));
                 }
-                return false;
-            }
-        });
-        windowManager.addView(videoFlyHead, params);
 
-//        if (mSession != null) {
-//            mSession.onPause();
-//
-//            if (mSubscriber != null) {
-//                mSubscriberViewContainer.removeView(mSubscriber.getView());
-//            }
-//        }
-//
-//        mNotifyBuilder = new NotificationCompat.Builder(this)
-//                .setContentTitle(this.getTitle())
-//                .setContentText(getResources().getString(R.string.notification))
-//                .setSmallIcon(R.drawable.appicon).setOngoing(true);
-//
-//        Intent notificationIntent = new Intent(this, VideoCallActivity.class);
-//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        PendingIntent intent = PendingIntent.getActivity(this, 0,
-//                notificationIntent, 0);
-//
-//        mNotifyBuilder.setContentIntent(intent);
-//        if (mConnection == null) {
-//            mConnection = new ServiceConnection() {
-//                @Override
-//                public void onServiceConnected(ComponentName className, IBinder binder) {
-//                    ((ClearNotificationService.ClearBinder) binder).service.startService(new Intent(VideoCallActivity.this, ClearNotificationService.class));
-//                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//                    mNotificationManager.notify(ClearNotificationService.NOTIFICATION_ID, mNotifyBuilder.build());
-//                }
-//
-//                @Override
-//                public void onServiceDisconnected(ComponentName className) {
-//                    mConnection = null;
-//                }
-//
-//            };
-//        }
-//
-//        if (!mIsBound) {
-//            bindService(new Intent(VideoCallActivity.this,
-//                            ClearNotificationService.class), mConnection,
-//                    Context.BIND_AUTO_CREATE);
-//            mIsBound = true;
-//            startService(notificationIntent);
-//        }
+                @Override
+                public void onServiceDisconnected(ComponentName className) {
+                    mConnection = null;
+                }
+
+            };
+        }
+        if (!mIsBound) {
+            bindService(new Intent(getApplicationContext(), VideoFlyService.class), mConnection,
+                    Context.BIND_AUTO_CREATE);
+            mIsBound = true;
+
+            if (mSession != null) {
+                mSession.disconnect();
+            }
+            startService(notificationIntent);
+        }
 
     }
 
@@ -241,16 +173,10 @@ public class VideoCallActivity extends AppCompatActivity implements
             mIsBound = false;
         }
 
-        if (!resumeHasRun) {
+        if(!resumeHasRun){
             resumeHasRun = true;
             return;
-        } else {
-            if (mSession != null) {
-                mSession.onResume();
-            }
         }
-        mNotificationManager.cancel(ClearNotificationService.NOTIFICATION_ID);
-
         reloadInterface();
     }
 
@@ -268,7 +194,6 @@ public class VideoCallActivity extends AppCompatActivity implements
             mIsBound = false;
         }
         if (isFinishing()) {
-            mNotificationManager.cancel(ClearNotificationService.NOTIFICATION_ID);
             if (mSession != null) {
                 mSession.disconnect();
             }
@@ -277,7 +202,6 @@ public class VideoCallActivity extends AppCompatActivity implements
 
     @Override
     public void onDestroy() {
-        mNotificationManager.cancel(ClearNotificationService.NOTIFICATION_ID);
         if (mIsBound) {
             unbindService(mConnection);
             mIsBound = false;
@@ -286,8 +210,6 @@ public class VideoCallActivity extends AppCompatActivity implements
         if (mSession != null) {
             mSession.disconnect();
         }
-
-        if (videoFlyHead != null) windowManager.removeView(videoFlyHead);
 
         super.onDestroy();
         finish();
@@ -366,7 +288,6 @@ public class VideoCallActivity extends AppCompatActivity implements
         if ((mSubscriber != null)) {
             unsubscribeFromStream(stream);
         }
-
     }
 
     @Override
@@ -484,12 +405,6 @@ public class VideoCallActivity extends AppCompatActivity implements
         }, 500);
     }
 
-    public void endCallButtonClicked(View view){
-        mStreams.clear();
-        mSession.disconnect();
-        this.mSubscriber = null;
-        stopService(new Intent(getApplicationContext(), VideoCallActivity.class));
-    }
 
     /**
      * Converts dp to real pixels, according to the screen density.
@@ -502,4 +417,19 @@ public class VideoCallActivity extends AppCompatActivity implements
         return (int) (screenDensity * (double) dp);
     }
 
+    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            return true;
+        }
+
+        @Override
+        public void onScaleEnd(ScaleGestureDetector detector){
+            float scale = detector.getScaleFactor();
+            if (scale <= 1){
+                Log.d("VideoCallActivity", "Scale" + scale);
+                //videoFly();
+            }
+        }
+    }
 }
