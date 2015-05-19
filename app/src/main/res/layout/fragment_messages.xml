@@ -25,6 +25,6 @@
         android:textSize="12dp"
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
-        android:text="Working on enabling OpenTok API to send and receive messages" />
+        android:text="In Beta: Message your friends feature coming soon." />
 
 </RelativeLayout>
