@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
                 title = getString(R.string.tittle_settings);
                 break;
             case 4:
-                logout();
+                logoutDialog();
                 break;
 
             default:
@@ -247,12 +247,30 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private void logoutDialog(){
+        new MaterialDialog.Builder(this)
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                        logout();
+                    }
+
+                    @Override
+                    public void onNegative(MaterialDialog dialog) {
+                    }
+                })
+                .title("Are you sure?")
+                .positiveText("Logout")
+                .negativeText("Cancel")
+                .autoDismiss(true)
+                .show();
+    }
     private void logout(){
         if(ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
 
             ParseUser.logOut();
 
-            Toast.makeText(getApplicationContext(), "Log Out Successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Logout Successful", Toast.LENGTH_SHORT).show();
             Intent i = new Intent(MainActivity.this, login.class);
             startActivity(i);
             finish();
