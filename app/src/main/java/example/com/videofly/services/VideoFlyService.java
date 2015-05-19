@@ -56,8 +56,7 @@ public class VideoFlyService  extends Service implements
     private Subscriber mSubscriber = VideoCallActivity.mSubscriber;
     private ArrayList<Stream> mStreams;
 
-
-
+    public static final String VIDEO_FLY_SERVICE = "VideoFlyService";
 
     @Override
     public IBinder onBind(Intent arg0) {
@@ -135,6 +134,19 @@ public class VideoFlyService  extends Service implements
             }
         });
         windowManager.addView(videoFlyHead, params);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(mStreams != null){
+            mStreams.clear();
+        }
+        this.mSubscriber = null;
+        if (mSession != null) {
+            mSession.disconnect();
+        }
+        if (videoFlyHead != null) windowManager.removeView(videoFlyHead);
     }
     //Session Methods
     private void sessionConnect(String sessionId,String token) {

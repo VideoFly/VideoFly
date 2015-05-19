@@ -14,6 +14,7 @@
 
     <string name="notification">Ongoing call</string>
     <string name="clearNotificationService">Clear Notification</string>
+    <string name="VideoFlyService">VideoFlyService</string>
 
     <!-- Content Description -->
     <string name="title_home">Home</string>

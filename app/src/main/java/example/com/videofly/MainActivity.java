@@ -303,6 +303,8 @@ public class MainActivity extends AppCompatActivity implements
                     .build();
             AppInviteDialog.show(this, content);
         }
+
+
     }
 
 
