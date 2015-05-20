@@ -63,6 +63,7 @@ public class FriendsFragment extends Fragment {
 
             @Override
             public void onLongClick(View view, int position) {
+
             }
         }));
 
