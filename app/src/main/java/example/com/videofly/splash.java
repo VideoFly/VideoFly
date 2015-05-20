@@ -10,11 +10,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
-
+import example.com.videofly.receivers.NetworkStatusReceiver;
 
 
 public class splash extends Activity {
@@ -34,13 +35,9 @@ public class splash extends Activity {
 
 
         new Handler().postDelayed(new Runnable() {
-
             @Override
             public void run() {
-
                 StartSplashScreenAnim();
-
-
             }
         }, SPLASH_TIME_OUT);
     }
@@ -74,24 +71,24 @@ public class splash extends Activity {
             @Override
             public void onAnimationEnd(Animation animation) {
                 ParseUser currentUser = ParseUser.getCurrentUser();
-                if(currentUser != null && (ParseFacebookUtils.isLinked(currentUser))){
-                    finish();
-                    Intent i = new Intent(splash.this, MainActivity.class);
-                    startActivity(i);
-                    finish();
-                }
-                else{
-                    finish();
+                if (currentUser != null && (ParseFacebookUtils.isLinked(currentUser))) {
+                    if (NetworkStatusReceiver.isOnline) {
+                        Intent i = new Intent(splash.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(), "Unable to Login! Check Network Connection", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
                     Intent i = new Intent(splash.this, login.class);
                     startActivity(i);
                     finish();
                 }
-
             }
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-
             }
         });
     }
