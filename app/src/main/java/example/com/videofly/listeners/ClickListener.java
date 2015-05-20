@@ -1,4 +1,4 @@
-package example.com.videofly;
+package example.com.videofly.listeners;
 
 import android.view.View;
 

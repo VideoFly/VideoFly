@@ -1,4 +1,4 @@
-package example.com.videofly;
+package example.com.videofly.receivers;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+
+import example.com.videofly.MainActivity;
+import example.com.videofly.VideoCallActivity;
 
 /**
  * Created by madhavchhura on 5/11/15.
