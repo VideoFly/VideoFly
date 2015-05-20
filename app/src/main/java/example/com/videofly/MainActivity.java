@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         image.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] byteArray = stream.toByteArray();
-        ParseFile parseFile = new ParseFile(user.getUser_fb_id()+".png", byteArray);
+        ParseFile parseFile = new ParseFile(user.getUser_fb_id() + ".png", byteArray);
         parseFile.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -148,9 +148,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onDrawerItemSelected(View view, int position) {
         displayView(position);
     }
-
-
-
 
     private void displayView(int position) {
         Fragment fragment = null;
@@ -569,10 +566,8 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void done(ParseException e) {
                 startActivity(i);
+                finish();
             }
         });
-        //parsePush.sendMessageInBackground(user.getUserName() + " is Video Calling You",pQuery);
-        //Intent i = new Intent(this, VideoCallActivity.class);
-        //startActivity(i);
     }
 }

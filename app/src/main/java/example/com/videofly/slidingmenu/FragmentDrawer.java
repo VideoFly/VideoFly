@@ -24,9 +24,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.videofly.ClickListener;
+import example.com.videofly.listeners.ClickListener;
 import example.com.videofly.R;
-import example.com.videofly.RecyclerTouchListener;
+import example.com.videofly.listeners.RecyclerTouchListener;
 
 /**
  * Created by madhavchhura on 4/20/15.

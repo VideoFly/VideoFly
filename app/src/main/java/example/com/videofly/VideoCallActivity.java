@@ -16,12 +16,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.opentok.android.BaseVideoRenderer;
 import com.opentok.android.OpentokError;
@@ -51,7 +51,7 @@ public class VideoCallActivity extends AppCompatActivity implements
     private String token = null;
     private Session mSession;
     private Publisher mPublisher;
-    public static Subscriber mSubscriber;
+    private Subscriber mSubscriber;
 
     private ArrayList<Stream> mStreams;
     private Handler mHandler = new Handler();
@@ -63,7 +63,7 @@ public class VideoCallActivity extends AppCompatActivity implements
     private ProgressBar mLoadingSub;
 
     private NotificationCompat.Builder mNotifyBuilder;
-    private NotificationManager mNotificationManager;
+    public static NotificationManager mNotificationManager;
     private boolean resumeHasRun = false;
     private boolean mIsBound = false;
     private boolean backPressed = false;
@@ -322,6 +322,7 @@ public class VideoCallActivity extends AppCompatActivity implements
     @Override
     public void onError(Session session, OpentokError opentokError) {
         Log.i(LOGTAG, "Publisher exception: " + opentokError.getMessage());
+        Toast.makeText(getApplicationContext(), opentokError.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     //Publisher.PublisherListener
@@ -338,6 +339,7 @@ public class VideoCallActivity extends AppCompatActivity implements
     @Override
     public void onError(PublisherKit publisherKit, OpentokError opentokError) {
         Log.i(LOGTAG, "Publisher exception: " + opentokError.getMessage());
+        Toast.makeText(getApplicationContext(), opentokError.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -444,21 +446,5 @@ public class VideoCallActivity extends AppCompatActivity implements
     private int dpToPx(int dp) {
         double screenDensity = this.getResources().getDisplayMetrics().density;
         return (int) (screenDensity * (double) dp);
-    }
-
-    private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector){
-            float scale = detector.getScaleFactor();
-            if (scale <= 1){
-                Log.d("VideoCallActivity", "Scale" + scale);
-                //videoFly();
-            }
-        }
     }
 }

@@ -12,10 +12,10 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import example.com.videofly.ClickListener;
+import example.com.videofly.listeners.ClickListener;
 import example.com.videofly.Friends;
 import example.com.videofly.R;
-import example.com.videofly.RecyclerTouchListener;
+import example.com.videofly.listeners.RecyclerTouchListener;
 import example.com.videofly.friendscards.FriendsAdapter;
 
 /**

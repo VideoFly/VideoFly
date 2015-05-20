@@ -36,7 +36,7 @@ import example.com.videofly.VideoCallActivity;
  */
 public class VideoFlyService  extends Service implements
         Session.SessionListener, Publisher.PublisherListener,
-        Subscriber.VideoListener {
+        Subscriber.VideoListener{
 
     private static final String LOGTAG = "VideoFlyService";
     private WindowManager windowManager;
@@ -53,7 +53,7 @@ public class VideoFlyService  extends Service implements
     //Variables for the OpenTok Methods
     private Session mSession;
     private Publisher mPublisher;
-    private Subscriber mSubscriber = VideoCallActivity.mSubscriber;
+    private Subscriber mSubscriber;
     private ArrayList<Stream> mStreams;
 
     public static final String VIDEO_FLY_SERVICE = "VideoFlyService";
@@ -97,7 +97,6 @@ public class VideoFlyService  extends Service implements
 
         Log.d("VideoCallActivity", "Created using MainActivity sessionID and token ID");
         sessionConnect(MainActivity.sessionId, MainActivity.token);
-
 
         final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -146,7 +145,8 @@ public class VideoFlyService  extends Service implements
         if (mSession != null) {
             mSession.disconnect();
         }
-        if (videoFlyHead != null) windowManager.removeView(videoFlyHead);
+        if (videoFlyHead != null)
+            windowManager.removeView(videoFlyHead);
     }
     //Session Methods
     private void sessionConnect(String sessionId,String token) {
@@ -239,7 +239,7 @@ public class VideoFlyService  extends Service implements
         Log.i(LOGTAG, "First frame received");
 
         // stop loading spinning
-        //mLoadingSub.setVisibility(View.GONE);
+        mLoadingSub.setVisibility(View.GONE);
         attachSubscriberView(mSubscriber);
     }
 
@@ -302,28 +302,10 @@ public class VideoFlyService  extends Service implements
     }
 
     public void endCallButtonClicked(View view){
-        if(mStreams != null){
-            mStreams.clear();
-        }
-        this.mSubscriber = null;
-        if (mSession != null) {
-            mSession.disconnect();
-        }
-        if (videoFlyHead != null) windowManager.removeView(videoFlyHead);
-
+        VideoCallActivity.mNotificationManager.cancel(ClearNotificationService.NOTIFICATION_ID);
+        Intent i = new Intent(VideoFlyService.this, MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
         stopService(new Intent(getApplicationContext(), VideoFlyService.class));
     }
-
-    /**
-     * Converts dp to real pixels, according to the screen density.
-     *
-     * @param dp A number of density-independent pixels.
-     * @return The equivalent number of real pixels.
-     */
-    private int dpToPx(int dp) {
-        double screenDensity = this.getResources().getDisplayMetrics().density;
-        return (int) (screenDensity * (double) dp);
-    }
-
-
 }
