@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -14,6 +13,7 @@ import com.parse.ParseUser;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -60,7 +60,7 @@ public class Friends {
                 Log.d("URL OF THE FRIEND IMAGE", friendImage.getUrl());
                 URL url = new URL(friendImage.getUrl());
                 bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                
+
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -70,4 +70,17 @@ public class Friends {
             e.printStackTrace();
         }
     }
+
+    public static Comparator<Friends> NameComparator = new Comparator<Friends>() {
+
+        public int compare(Friends f1, Friends f2) {
+            String StudentName1 = f1.getName().toUpperCase();
+            String StudentName2 = f2.getName().toUpperCase();
+
+            //ascending order
+            return StudentName1.compareTo(StudentName2);
+
+            //descending order
+            //return StudentName2.compareTo(StudentName1);
+        }};
 }

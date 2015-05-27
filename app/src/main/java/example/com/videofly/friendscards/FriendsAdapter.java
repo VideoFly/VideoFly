@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import example.com.videofly.Friends;
 import example.com.videofly.R;
@@ -23,6 +24,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
     ArrayList<Friends> friendsList;
 
     public  FriendsAdapter(ArrayList<Friends> list){
+        Collections.sort(list, Friends.NameComparator);
         this.friendsList = list;
     }
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
@@ -62,6 +64,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendsV
     @Override
     public void onBindViewHolder(FriendsViewHolder holder, int position){
         Log.d("Friends View Holder", "Assigning Friends values");
+
         holder.personName.setText(friendsList.get(position).getName());
         holder.personPhoto.setImageBitmap(friendsList.get(position).getFriendImage());
 
