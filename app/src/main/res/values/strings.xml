@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">VideoFly</string>
+
+    <string name="fbLoginButton">FB Login Button</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">login</string>
+    <string name="title_activity_splash">splash</string>
+    <string name="appIcon">App Icon</string>
+    <string name="facebook_app_id">743914899061568</string>
+    <string name="opentok_api_key">45220792</string>
+    <string name="appID"></string>
+    <string name="login">Login</string>
+    <string name="action_search">Search</string>
+
+    <string name="notification">Ongoing call</string>
+    <string name="clearNotificationService">Clear Notification</string>
+    <string name="VideoFlyService">VideoFlyService</string>
+
+    <!-- Content Description -->
+    <string name="title_home">Home</string>
+    <string name="title_friends">Friends</string>
+    <string name="title_messages">Messages</string>
+    <string name="tittle_invite_friends">Invite Friends</string>
+    <string name="tittle_settings">Settings</string>
+
+    <!--Nav Drawer Menu Items -->
+    <string name="nav_item_home">Home</string>
+    <string name="nav_item_friends">Friends</string>
+    <string name="nav_item_messages">Messages</string>
+    <string name="nav_item_invite_friends">Invite Friends</string>
+    <string name="nav_item_settings">Settings</string>
+    <string name="nav_item_logout">Logout</string>
+
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_home</item>
+        <item>@string/nav_item_friends</item>
+        <item>@string/nav_item_messages</item>
+        <item>@string/nav_item_settings</item>
+        <item>@string/nav_item_logout</item>
+    </string-array>
+
+
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_home</item>
+        <item>@drawable/ic_friends</item>
+        <item>@drawable/ic_message</item>
+        <item>@drawable/ic_settings</item>
+        <item>@drawable/ic_logout</item>
+    </array>
+    <string name="title_activity_video_call">VideoCallActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_video_fly">video_fly</string>
+    <string name="title_activity_video_controls">video_controls</string>
+
+
+</resources>
