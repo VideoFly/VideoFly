@@ -1,7 +1,13 @@
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/node_modules
+/bower_components
+/ignore
+
+# OS generated files #
+######################
 .DS_Store
-/build
-/captures
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
