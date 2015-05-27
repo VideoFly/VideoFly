@@ -1,44 +1,31 @@
-## Oleose - Mobile App Landing Page
+﻿#VideoFly
 
-Oleose is free bootstrap Bootstrap 3 template with eye catching fully responsive design for any app profissional landing page. Template comes with developer friendly and easy to customizable code. It works on all main web browsers 'IE8+', tablets and phones.
+---
 
-Template Link & Preview [Oleose Preview](http://www.scoopthemes.com/templates/Oleose-Theme/)
+VideoFly is a video calling application which enables you to stay in a video call while using other applications. 
 
-### Author
+##Description
 
-Built with all the love in the world by Scoop Themes.
+Have you ever had a problem of being in a video call while using other applications?
+Stop hanging up the video call to do other things! Multi-tasking is easy with VideoFly! 
 
-Check more of our open source templates and themes [http://scoopthemes.com](http://scoopthemes.com).
+When you try to use other applictions, VideoFly creates a small bubble and stays on top of the current application. 
 
-Follow us on twitter and stay tuned for any upcoming free items [@ScoopThemes](https://twitter.com/ScoopThemes).
+This means you can...
 
-### Features
+* Play games with your friends face to face.
+* Have an online meeting while reading documents or with a browser open.
+* Send pictures and videos and see your friend's immediate reaction. 
+* Watch movies, read books, and listen to music while video chatting.
+* Basically do whatever you want to do while on VideoFly!
 
-+ Built With Bootstrap 3 Latest Stable Version.
-+ Section Animation.
-+ Eye Catching
-+ JQuery Latest Plugins.
-+ Three Predefined Colors.
-+ Three Free Logo PSD.
-+ Mobile Mockups.
-+ Built With LESS.
-+ Well Documented.
-+ SEO Friendly.
-+ W3C Valid HTML5.
+##Features
 
-### Changelog
+* Login with Facebook and invite friends instantly.
+* Your information is automatically synced from Facebook.
+* You can still edit your profile. Upload your newest selfie!
+* Video chat to see and talk with your friends anytime.
+* A small "Chat Bubble" appears when using other applications to ensure uniterrupted video chat.
 
-##### Version 1.2
-+ Bootstrap update 3.3.2
-+ Mobile menu disapear on link click
-+ Changing colors now easier
-+ Better project structure
-+ Bug fixes
-
-
-### License
-
-All demos and examples, whether in a code project’s repository or displayed on a Scoop Themes site, are released under the terms of [CC0](http://en.wikipedia.org/wiki/Creative_Commons_license/).
-
-CC0 is even more permissive than the MIT license, allowing you to use the code in any manner you want, without any copyright headers, notices, or other attribution.
+##Requirements
 
