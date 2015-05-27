@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import example.com.videofly.CircleVideoRenderer;
 import example.com.videofly.MainActivity;
 import example.com.videofly.R;
 import example.com.videofly.VideoCallActivity;
@@ -267,6 +268,8 @@ public class VideoFlyService  extends Service implements
     private void subscribeToStream(Stream stream) {
         Log.d(LOGTAG, "subscribing to stream");
         mSubscriber = new Subscriber(this, stream);
+        CircleVideoRenderer circleVideoRenderer = new CircleVideoRenderer(getApplicationContext());
+        mSubscriber.setRenderer(circleVideoRenderer);
         mSubscriber.setVideoListener(this);
         mSubscriber.setSubscribeToAudio(true);
         mSubscriber.setSubscribeToVideo(true);
