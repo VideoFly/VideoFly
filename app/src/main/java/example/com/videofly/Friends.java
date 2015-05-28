@@ -82,5 +82,6 @@ public class Friends {
 
             //descending order
             //return StudentName2.compareTo(StudentName1);
-        }};
+        }
+    };
 }

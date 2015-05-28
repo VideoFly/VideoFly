@@ -566,7 +566,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void done(ParseException e) {
                 startActivity(i);
-                finish();
             }
         });
     }
