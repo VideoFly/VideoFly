@@ -2,8 +2,10 @@ package example.com.videofly;
 
 import android.graphics.Bitmap;
 
+import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseInstallation;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import org.json.JSONArray;
@@ -17,7 +19,8 @@ import java.util.ArrayList;
  * Created by madhavchhura on 4/21/15.
  */
 
-public class User {
+@ParseClassName("User")
+public class User extends ParseObject {
 
     private Bitmap userProfilePicture;
     private String userName;
@@ -44,7 +47,7 @@ public class User {
     }
 
     public String getUserName() {
-        return userName;
+        return getString("username");
     }
 
     public void setUserName(String userName) {

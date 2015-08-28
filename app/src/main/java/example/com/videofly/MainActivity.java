@@ -30,6 +30,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
+import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseACL;
 import com.parse.ParseCloud;
@@ -52,6 +53,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 
 import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements
         FragmentDrawer.FragmentDrawerListener,
         FriendsFragment.CallFriendListener{
 
+    final String LOGTAG = "MainActivity";
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
     private  User user;
@@ -83,7 +86,10 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         user = new User();
-        makeMeRequest();
+        if(ParseUser.getCurrentUser().isNew())
+            makeMeRequest();
+        else
+            loadDataLocally();
     }
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -106,10 +112,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateUserData() {
-        user.setUser_fb_id(usr.optString("id"));
-        user.setUserName(usr.optString("name"));
-        Log.d("THIS DOESNT MAKE SENSE", user.getUserName());
-        user.setUserEmail(usr.optString("email"));
+        if(usr != null) {
+            user.setUser_fb_id(usr.optString("id"));
+            user.setUserName(usr.optString("name"));
+            user.setUserEmail(usr.optString("email"));
+        }
 
         if(ParseUser.getCurrentUser().isNew()){
             imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
@@ -119,6 +126,12 @@ public class MainActivity extends AppCompatActivity implements
         else
             user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
 
+        user.pinInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+
+            }
+        });
         saveSessionToParse();
         ParseUser.getCurrentUser().saveInBackground();
         user.saveUserToParse();
@@ -417,6 +430,55 @@ public class MainActivity extends AppCompatActivity implements
 
         cursor.moveToFirst();
         return cursor.getInt(0);
+    }
+
+
+    private void loadDataLocally() {
+        Log.i(LOGTAG, "Loading data locally!");
+        ParseQuery<User> localQuery = ParseQuery.getQuery(User.class);
+        localQuery.fromLocalDatastore();
+        localQuery.whereEqualTo("username",ParseUser.getCurrentUser().getUsername());
+        localQuery.findInBackground(new FindCallback<User>() {
+            @Override
+            public void done(List<User> objects, ParseException e) {
+                if (e == null) {
+                    for (User item : objects) {
+                        user = item;
+                    }
+                } else {
+                    Log.d(LOGTAG, "Exception, while querying the Items List from Local database." + e.getMessage());
+                }
+                if (user == null)
+                    loadFromNetwork();
+                else {
+                    Log.i(LOGTAG, "Finished loading local data.");
+                    updateUserData();
+                }
+            }
+        });
+    }
+
+    private void loadFromNetwork() {
+        Log.i(LOGTAG, "Loading data from the Network!");
+        ParseQuery<User> query = ParseQuery.getQuery(User.class);
+        query.orderByAscending("description");
+        query.findInBackground(new FindCallback<User>() {
+            public void done(List<User> objects, ParseException e) {
+                if (e == null) {
+                    for (User user : objects) {
+                        user.pinInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                Log.i(LOGTAG, "Saving data Locally!");
+                            }
+                        });
+                    }
+                    updateUserData();
+                } else {
+                    Log.d("LOGTAG", "Exception, while querying the Items List from Parse database." + e.getMessage());
+                }
+            }
+        });
     }
 
 
