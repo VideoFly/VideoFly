@@ -1,12 +1,13 @@
 package example.com.videofly;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
-import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseInstallation;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,9 +20,9 @@ import java.util.ArrayList;
  * Created by madhavchhura on 4/21/15.
  */
 
-@ParseClassName("User")
-public class User extends ParseObject {
 
+public class User {
+    private final String LOGTAG = "User";
     private Bitmap userProfilePicture;
     private String userName;
     private String userEmail;
@@ -47,7 +48,7 @@ public class User extends ParseObject {
     }
 
     public String getUserName() {
-        return getString("username");
+        return userName;
     }
 
     public void setUserName(String userName) {
@@ -81,8 +82,11 @@ public class User extends ParseObject {
     }
 
     public void setUserImage(ParseFile profileImage) {
-        this.userImage = profileImage;
-        parseUser.put("userImage", profileImage);
+        if(profileImage != null) {
+            this.userImage = profileImage;
+            if(ParseUser.getCurrentUser() != null)
+                ParseUser.getCurrentUser().put("userImage", profileImage);
+        }
     }
     public ArrayList<Friends> getUserFriends() {
         return userFriends;
@@ -103,6 +107,12 @@ public class User extends ParseObject {
         //put("friends",userFriends);
     }
     public void saveUserToParse(){
-        installation.saveInBackground();
+
+        installation.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.d(LOGTAG,"Installation saved to the Parse");
+            }
+        });
     }
 }

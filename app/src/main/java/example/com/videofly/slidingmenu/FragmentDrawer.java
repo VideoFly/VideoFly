@@ -17,15 +17,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.facebook.Profile;
 import com.parse.ParseUser;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.videofly.listeners.ClickListener;
 import example.com.videofly.R;
+import example.com.videofly.listeners.ClickListener;
 import example.com.videofly.listeners.RecyclerTouchListener;
 
 /**
@@ -103,7 +102,7 @@ public class FragmentDrawer extends Fragment {
                     .into(profileImageView);
         }
 
-        nameTextView.setText(Profile.getCurrentProfile().getName());
+        nameTextView.setText(ParseUser.getCurrentUser().getUsername());
         editImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

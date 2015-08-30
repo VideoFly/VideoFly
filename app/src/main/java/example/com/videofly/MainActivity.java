@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,7 +31,6 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.share.model.AppInviteContent;
 import com.facebook.share.widget.AppInviteDialog;
-import com.parse.FindCallback;
 import com.parse.FunctionCallback;
 import com.parse.ParseACL;
 import com.parse.ParseCloud;
@@ -53,7 +53,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 
 import bolts.AppLinks;
 import example.com.videofly.fragments.FriendsFragment;
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar mToolbar;
     private FragmentDrawer drawerFragment;
     private  User user;
-    private JSONObject usr;
     private Bitmap imgBitmap = null;
     private ParseObject broadcastObject;
     public static String sessionId;
@@ -86,10 +84,16 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         user = new User();
-        if(ParseUser.getCurrentUser().isNew())
+        //makeMeRequest();
+        if(ParseUser.getCurrentUser().isNew()){
+            Log.d(LOGTAG,"New User");
             makeMeRequest();
-        else
-            loadDataLocally();
+        }
+
+        else {
+            Log.d(LOGTAG, "LoadDataLocally");
+            loadUserLocally();
+        }
     }
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -111,30 +115,23 @@ public class MainActivity extends AppCompatActivity implements
         displayView(0);
     }
 
-    private void updateUserData() {
+    private void updateUserData(JSONObject usr) {
+        //Set the user details obtained from Fb to the Parse User class.
         if(usr != null) {
             user.setUser_fb_id(usr.optString("id"));
             user.setUserName(usr.optString("name"));
             user.setUserEmail(usr.optString("email"));
-        }
 
-        if(ParseUser.getCurrentUser().isNew()){
-            imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
-            user.setUserImage(uploadImageFile(imgBitmap));
-            ParseUser.getCurrentUser().saveInBackground();
-        }
-        else
-            user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
-
-        user.pinInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-
+            if(ParseUser.getCurrentUser().isNew()){
+                imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
+                user.setUserImage(uploadImageFile(imgBitmap));
             }
-        });
-        saveSessionToParse();
-        ParseUser.getCurrentUser().saveInBackground();
-        user.saveUserToParse();
+            else
+                user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
+
+            user.saveUserToParse();
+            saveSessionToParse();
+        }
     }
 
     private ParseFile uploadImageFile(Bitmap image) {
@@ -148,8 +145,8 @@ public class MainActivity extends AppCompatActivity implements
             public void done(ParseException e) {
                 Toast.makeText(getApplicationContext(), "Image Changed", Toast.LENGTH_LONG).show();
                 if (e != null) {
-                    Log.d("Error Saving", e.getMessage());
-                    Toast.makeText(getApplicationContext(), "Error Saving" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.d(LOGTAG, "Error Saving ParseFile" + e.getMessage());
+                    Toast.makeText(getApplicationContext(), "Error Saving ParseFile" + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -316,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements
         FacebookSdk.sdkInitialize(getApplicationContext());
         Uri targetUrl = AppLinks.getTargetUrlFromInboundIntent(this, getIntent());
         if (targetUrl != null) {
-            Log.i("Activity", "App Link Target URL: " + targetUrl.toString());
+            Log.i(LOGTAG, "App Link Target URL: " + targetUrl.toString());
         }
 
         String appLinkUrl, previewImageUrl;
@@ -340,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.d("In on Acitivity Result", "creating new Fragment Drawer");
+            Log.d(LOGTAG, "onActivityResult - creating new Fragment Drawer");
             Bundle extras = data.getExtras();
             imgBitmap = (Bitmap) extras.get("data");
             user.setUserImage(uploadImageFile(imgBitmap));
@@ -422,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements
     private int getOrientation(Context context, Uri photoUri) {
         /* it's on the external media. */
         Cursor cursor = context.getContentResolver().query(photoUri,
-                new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+                new String[]{MediaStore.Images.ImageColumns.ORIENTATION}, null, null, null);
 
         if (cursor.getCount() != 1) {
             return -1;
@@ -432,54 +429,63 @@ public class MainActivity extends AppCompatActivity implements
         return cursor.getInt(0);
     }
 
-
-    private void loadDataLocally() {
-        Log.i(LOGTAG, "Loading data locally!");
-        ParseQuery<User> localQuery = ParseQuery.getQuery(User.class);
-        localQuery.fromLocalDatastore();
-        localQuery.whereEqualTo("username",ParseUser.getCurrentUser().getUsername());
-        localQuery.findInBackground(new FindCallback<User>() {
-            @Override
-            public void done(List<User> objects, ParseException e) {
-                if (e == null) {
-                    for (User item : objects) {
-                        user = item;
-                    }
-                } else {
-                    Log.d(LOGTAG, "Exception, while querying the Items List from Local database." + e.getMessage());
-                }
-                if (user == null)
-                    loadFromNetwork();
-                else {
-                    Log.i(LOGTAG, "Finished loading local data.");
-                    updateUserData();
-                }
-            }
-        });
+    private void saveUserLocally(String dataType, JSONObject userJSON){
+        PreferenceManager.getDefaultSharedPreferences(
+                getApplicationContext()).edit().putString(dataType, userJSON.toString()).commit();
     }
 
-    private void loadFromNetwork() {
-        Log.i(LOGTAG, "Loading data from the Network!");
-        ParseQuery<User> query = ParseQuery.getQuery(User.class);
-        query.orderByAscending("description");
-        query.findInBackground(new FindCallback<User>() {
-            public void done(List<User> objects, ParseException e) {
-                if (e == null) {
-                    for (User user : objects) {
-                        user.pinInBackground(new SaveCallback() {
-                            @Override
-                            public void done(ParseException e) {
-                                Log.i(LOGTAG, "Saving data Locally!");
-                            }
-                        });
-                    }
-                    updateUserData();
-                } else {
-                    Log.d("LOGTAG", "Exception, while querying the Items List from Parse database." + e.getMessage());
-                }
-            }
-        });
+    private void saveUserFriendsLocally(JSONArray jsonArray){
+        PreferenceManager.getDefaultSharedPreferences(
+                getApplicationContext()).edit().putString("userFriends", jsonArray.toString()).commit();
     }
+
+    private void loadUserFriendsLocally(){
+        String strJson = PreferenceManager.getDefaultSharedPreferences
+                (getApplicationContext()).getString("userFriends", "null");
+        if(!strJson.equals("null")) {
+            Log.d(LOGTAG,"going inside try");
+            try {
+                JSONArray jsonArray = new JSONArray(strJson);
+                new getFriendsAsync().execute(jsonArray);
+                createDisplay();
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        pullNewDataFromNetwork();
+                    }
+                });
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadUserLocally() {
+        String strJson = PreferenceManager.getDefaultSharedPreferences
+                (getApplicationContext()).getString("user", "null");
+        if(!strJson.equals("null")) {
+            Log.d(LOGTAG,"going inside try");
+            try {
+                JSONObject jsonData = new JSONObject(strJson);
+                updateUserData(jsonData);
+                loadUserFriendsLocally();
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            makeMeRequest();
+        }
+    }
+
+    private void pullNewDataFromNetwork(){
+        makeMeRequest();
+        createDisplay();
+    }
+
 
 
     /*
@@ -491,13 +497,23 @@ public class MainActivity extends AppCompatActivity implements
      * profile information.
      */
     private void makeMeRequest() {
+        Log.d(LOGTAG,"makeMeRequest");
         GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        usr = object;
-                        updateUserData();
-                        fbFriendsRequest();
+                        if(object == null) {
+                            Toast.makeText(getApplicationContext(), "Unable to connect with facebook", Toast.LENGTH_LONG).show();
+                            Intent i = new Intent(MainActivity.this,login.class);
+                            startActivity(i);
+                            finish();
+                        }else {
+                            String dataType = "user";
+                            JSONObject usr = object;
+                            saveUserLocally(dataType, object);
+                            updateUserData(usr);
+                            fbFriendsRequest();
+                        }
                     }
                 });
         Bundle parameters = new Bundle();
@@ -510,13 +526,14 @@ public class MainActivity extends AppCompatActivity implements
      *  friends from facebook in a AsyncTask.
      **/
     private void fbFriendsRequest(){
+        Log.d(LOGTAG,"fbFriendsRequest");
         GraphRequest request = GraphRequest.newMyFriendsRequest(
                 AccessToken.getCurrentAccessToken(),
                 new GraphRequest.GraphJSONArrayCallback() {
                     @Override
                     public void onCompleted(final JSONArray jsonArray, GraphResponse graphResponse) {
-                        new getFriendsAsync().execute(jsonArray);
-                        createDisplay();
+                        Log.d(LOGTAG, "fbFriendsRequest - onCompleted");
+                        saveUserFriendsLocally(jsonArray);
                     }
                 });
         request.executeAsync();
@@ -527,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements
      **/
     class getFriendsAsync extends AsyncTask<JSONArray, Void, Void> {
         protected Void doInBackground(JSONArray... arg0) {
-            Log.d("DoINBackGround","On doInBackground...");
+            Log.d(LOGTAG,"getFriendsAsync - doInBackground");
             user.setUserFriends(arg0[0]);
             return null;
         }
@@ -560,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void done(ParseException e) {
                 isBroadcastOwner();
-                saveTokeToCloud();
+                saveTokenToCloud();
             }
         });
     }
@@ -570,20 +587,20 @@ public class MainActivity extends AppCompatActivity implements
      * is used to generate unique OpenTokek sessionId, and tokens for the
      * current logged in user.
      */
-    private void saveTokeToCloud(){
+    private void saveTokenToCloud(){
         HashMap<String, Object> params = new HashMap<String, Object>();
         params.put("broadcast", broadcastObject.getObjectId());
         ParseCloud.callFunctionInBackground("getBroadcastToken", params, new FunctionCallback<String>() {
             public void done(String response, ParseException e) {
                 if (e == null) {
-                    Log.d("Cloud Response", "There were no exceptions! " + response);
+                    Log.d(LOGTAG, "Cloud Response: There were no exceptions! " + response);
                     token = response;
                     broadcastObject.put("publisherToken", response);
                     broadcastObject.put("subscriberToken", response);
                     broadcastObject.saveInBackground();
                     sessionId = broadcastObject.getString("sessionId");
                 } else {
-                    Log.d("Cloud Response", "Exception: " + response + e);
+                    Log.d(LOGTAG, "Cloud Response: Exception: " + response + e);
                 }
             }
         });
@@ -597,7 +614,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private boolean isBroadcastOwner (){
         if(broadcastObject.get("owner").equals(ParseUser.getCurrentUser())){
-            Log.d("Check Owner", "This is the owner");
+            Log.d(LOGTAG, "Checking Owner - This is the owner");
             return true;
         }
         return false;
@@ -605,9 +622,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onCallFriend(String friendId) {
-        Log.d("MainActivity", "onCallFriend Called " + friendId);
+        Log.d(LOGTAG, "onCallFriend Called " + friendId);
         JSONObject data = new JSONObject();
-        Log.d("MainActivity", "sessionId: " + sessionId);
+        Log.d(LOGTAG, "sessionId: " + sessionId);
         try {
             data.put("sessionId",sessionId);
             data.put("publisherToken",token);

@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.Profile;
+import com.parse.ParseUser;
 
 import example.com.videofly.R;
 import example.com.videofly.User;
@@ -42,7 +42,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
         TextView homeText = (TextView) rootView.findViewById(R.id.label);
-        homeText.setText(Profile.getCurrentProfile().getName());
+        homeText.setText(ParseUser.getCurrentUser().getUsername());
 
         // Inflate the layout for this fragment
         return rootView;
