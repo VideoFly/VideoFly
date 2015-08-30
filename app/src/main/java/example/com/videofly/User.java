@@ -94,6 +94,7 @@ public class User {
     public void setUserFriends(final JSONArray userFriends) {
         this.userFriends = new ArrayList();
         if(userFriends!=null){
+            this.userFriends.add(new Friends("Test Call","100"));
             for(int i = 0; i < userFriends.length(); i++){
                 try {
                     JSONObject childObject = userFriends.getJSONObject(i);

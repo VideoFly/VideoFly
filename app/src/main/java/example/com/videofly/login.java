@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.facebook.AccessToken;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -17,6 +19,7 @@ import com.parse.ParseUser;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 
 public class login extends AppCompatActivity{
@@ -46,41 +49,67 @@ public class login extends AppCompatActivity{
 
     private void userLogin() {
 
-        List<String> permissions = Arrays.asList("user_friends", "email");
+        List<String> permissions = Arrays.asList("public_profile","user_friends", "email");
 
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
-            //Set<String> declinedPermission = null;
+            Set<String> declinedPermission = null;
+
             @Override
             public void done(ParseUser user, ParseException err) {
                 mLoginButton.setEnabled(true);
+                declinedPermission = AccessToken.getCurrentAccessToken().getDeclinedPermissions();
                 if (user == null) {
                     Log.d(LOGTAG, "Uh oh. The user cancelled the Facebook login.");
                     Toast.makeText(getApplicationContext(), "Unable to Login! Try Again", Toast.LENGTH_SHORT).show();
-                } else if (user.isNew()) {
-                   // declinedPermission = AccessToken.getCurrentAccessToken().getDeclinedPermissions();
+                }
+                else if (user.isNew()) {
+                    if (declinedPermission != null) {
+                        if (declinedPermission.size() > 0)
+                            showPermissionsInvalidDialog();
+                    }
+                    else {
+                        Log.d(LOGTAG, "User signed up and logged in through Facebook!");
+                        Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(login.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
+                    }
+                }
+                else {
+                    if (declinedPermission.size() > 0) {
+                        Log.d(LOGTAG, "declined permission is not null");
+                        Log.d(LOGTAG, "declined permission size: " + declinedPermission.size());
+                        showPermissionsInvalidDialog();
+                    }
+                    else{
+                        Log.d(LOGTAG, "declined permission size was not greater then 0");
+                        Log.d(LOGTAG, "declined permission size: " + declinedPermission.size());
+                        Log.d(LOGTAG, "User logged in through Facebook!");
+                        Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(login.this, MainActivity.class);
+                        startActivity(i);
+                        finish();
 
-                    Log.d(LOGTAG, "User signed up and logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(login.this, MainActivity.class);
-                    startActivity(i);
-                    finish();
-                } else {
-//                    if(declinedPermission != null) {
-//                        for (String myVal : declinedPermission) {
-//                            Log.d("Declined Permissions: 1", "String 1 " + myVal);
-//                        }
-//                        Log.d("Declined Permissions", declinedPermission.toString());
-//                    }else
-//                        Log.d("Declined NULL", "null");
-                    Log.d(LOGTAG, "User logged in through Facebook!");
-                    Toast.makeText(getApplicationContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(login.this, MainActivity.class);
-                    startActivity(i);
-                    finish();
+                    }
                 }
             }
         });
 
+    }
+
+    private void showPermissionsInvalidDialog(){
+        new MaterialDialog.Builder(this)
+                .callback(new MaterialDialog.ButtonCallback() {
+                    @Override
+                    public void onPositive(MaterialDialog dialog) {
+                    }
+
+                })
+                .title("Uh Oh! We need Permissions")
+                .content("Please make sure all permission are granted!")
+                .positiveText("Ok")
+                .autoDismiss(true)
+                .show();
     }
 
 
@@ -103,7 +132,7 @@ public class login extends AppCompatActivity{
             case R.id.login:
                 mLoginButton.setEnabled(false);
                 userLogin();
-            break;
+                break;
 
         }
         return super.onOptionsItemSelected(item);

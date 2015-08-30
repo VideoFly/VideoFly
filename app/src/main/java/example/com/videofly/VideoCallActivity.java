@@ -71,6 +71,7 @@ public class VideoCallActivity extends AppCompatActivity implements
 
     private ServiceConnection mConnection;
     private Intent serviceIntent;
+    private boolean subscribeToSelf = false;
 
     @SuppressLint("WrongViewCast")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -102,6 +103,7 @@ public class VideoCallActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         sessionId = intent.getStringExtra("sessionId");
         token = intent.getStringExtra("publisherToken");
+        subscribeToSelf = intent.getBooleanExtra("subscribeToSelf",false);
 
         JSONObject json = null;
 
@@ -303,19 +305,22 @@ public class VideoCallActivity extends AppCompatActivity implements
 
     @Override
     public void onStreamReceived(Session session, Stream stream) {
-        mStreams.add(stream);
-        if (mSubscriber == null) {
-            subscribeToStream(stream);
-        }
-        else{
-            mSession.subscribe(mSubscriber);
+        if(!subscribeToSelf) {
+            mStreams.add(stream);
+            if (mSubscriber == null) {
+                subscribeToStream(stream);
+            } else {
+                mSession.subscribe(mSubscriber);
+            }
         }
     }
 
     @Override
     public void onStreamDropped(Session session, Stream stream) {
-        if ((mSubscriber != null)) {
-            unsubscribeFromStream(stream);
+        if(!subscribeToSelf) {
+            if ((mSubscriber != null)) {
+                unsubscribeFromStream(stream);
+            }
         }
     }
 
@@ -328,12 +333,18 @@ public class VideoCallActivity extends AppCompatActivity implements
     //Publisher.PublisherListener
     @Override
     public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
-
+        if (subscribeToSelf) {
+            mStreams.add(stream);
+            if (mSubscriber == null) {
+                subscribeToStream(stream);
+            }
+        }
     }
 
     @Override
     public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
-
+        if(!subscribeToSelf && mSubscriber != null)
+            unsubscribeFromStream(stream);
     }
 
     @Override

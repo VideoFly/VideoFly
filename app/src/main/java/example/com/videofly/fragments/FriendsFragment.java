@@ -1,7 +1,6 @@
 package example.com.videofly.fragments;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,11 +11,11 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import example.com.videofly.listeners.ClickListener;
 import example.com.videofly.Friends;
 import example.com.videofly.R;
-import example.com.videofly.listeners.RecyclerTouchListener;
 import example.com.videofly.friendscards.FriendsAdapter;
+import example.com.videofly.listeners.ClickListener;
+import example.com.videofly.listeners.RecyclerTouchListener;
 
 /**
  * Created by madhavchhura on 4/21/15.
@@ -71,10 +70,6 @@ public class FriendsFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-    }
 
     @Override
     public void onDetach() {

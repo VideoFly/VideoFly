@@ -74,11 +74,11 @@ public class Friends {
     public static Comparator<Friends> NameComparator = new Comparator<Friends>() {
 
         public int compare(Friends f1, Friends f2) {
-            String StudentName1 = f1.getName().toUpperCase();
-            String StudentName2 = f2.getName().toUpperCase();
+            String friendA = f1.getName().toUpperCase();
+            String friendB = f2.getName().toUpperCase();
 
             //ascending order
-            return StudentName1.compareTo(StudentName2);
+            return friendA.compareTo(friendB);
 
             //descending order
             //return StudentName2.compareTo(StudentName1);

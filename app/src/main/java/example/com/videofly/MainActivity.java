@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements
     private ParseObject broadcastObject;
     public static String sessionId;
     public static String token;
+    public static boolean subscribeToSelf = false;
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int RESULT_LOAD_IMG = 0;
     final int MAX_IMAGE_DIMENSION = (int) (96 * Resources.getSystem().getDisplayMetrics().density);
@@ -81,19 +82,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         user = new User();
-        //makeMeRequest();
-        if(ParseUser.getCurrentUser().isNew()){
-            Log.d(LOGTAG,"New User");
+
+        if(ParseUser.getCurrentUser().getEmail() != null){
+            Log.d(LOGTAG, "Old User Logged In: ");
+            loadUserLocally();
+        }else {
+            Log.d(LOGTAG, "New User Signed Up");
             makeMeRequest();
         }
 
-        else {
-            Log.d(LOGTAG, "LoadDataLocally");
-            loadUserLocally();
-        }
     }
     private void createDisplay() {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,12 +123,13 @@ public class MainActivity extends AppCompatActivity implements
             user.setUserName(usr.optString("name"));
             user.setUserEmail(usr.optString("email"));
 
-            if(ParseUser.getCurrentUser().isNew()){
+            ParseFile userImage = ParseUser.getCurrentUser().getParseFile("userImage");
+
+            if(userImage == null) {
                 imgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_profile);
                 user.setUserImage(uploadImageFile(imgBitmap));
-            }
-            else
-                user.setUserImage(ParseUser.getCurrentUser().getParseFile("userImage"));
+            } else
+                user.setUserImage(userImage);
 
             user.saveUserToParse();
             saveSessionToParse();
@@ -274,7 +276,6 @@ public class MainActivity extends AppCompatActivity implements
     }
     private void logout(){
         if(ParseFacebookUtils.isLinked(ParseUser.getCurrentUser())){
-
             ParseUser.logOut();
 
             Toast.makeText(getApplicationContext(), "Logout Successful", Toast.LENGTH_SHORT).show();
@@ -449,12 +450,12 @@ public class MainActivity extends AppCompatActivity implements
                 new getFriendsAsync().execute(jsonArray);
                 createDisplay();
 
-                new Thread(new Runnable() {
+                new Runnable() {
                     @Override
                     public void run() {
-                        pullNewDataFromNetwork();
+                        makeMeRequest();
                     }
-                });
+                };
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -481,10 +482,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void pullNewDataFromNetwork(){
-        makeMeRequest();
-        createDisplay();
-    }
 
 
 
@@ -508,9 +505,8 @@ public class MainActivity extends AppCompatActivity implements
                             startActivity(i);
                             finish();
                         }else {
-                            String dataType = "user";
                             JSONObject usr = object;
-                            saveUserLocally(dataType, object);
+                            saveUserLocally("user", object);
                             updateUserData(usr);
                             fbFriendsRequest();
                         }
@@ -533,6 +529,8 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onCompleted(final JSONArray jsonArray, GraphResponse graphResponse) {
                         Log.d(LOGTAG, "fbFriendsRequest - onCompleted");
+                        new getFriendsAsync().execute(jsonArray);
+                        createDisplay();
                         saveUserFriendsLocally(jsonArray);
                     }
                 });
@@ -540,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /** Class Description of getFriendsAsync
-     *  AsyncTask to get users friends from facebook.
+     *  AsyncTask to set users friends.
      **/
     class getFriendsAsync extends AsyncTask<JSONArray, Void, Void> {
         protected Void doInBackground(JSONArray... arg0) {
@@ -623,29 +621,41 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onCallFriend(String friendId) {
         Log.d(LOGTAG, "onCallFriend Called " + friendId);
-        JSONObject data = new JSONObject();
-        Log.d(LOGTAG, "sessionId: " + sessionId);
-        try {
-            data.put("sessionId",sessionId);
-            data.put("publisherToken",token);
-            data.put("alert", user.getUserName() + " is Video Calling You");
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(friendId == "100"){
+            subscribeToSelf = true;
+            Intent i = new Intent(this, VideoCallActivity.class);
+            i.putExtra("sessionId", sessionId);
+            i.putExtra("publisherToken", token);
+            i.putExtra("subscribeToSelf", true);
+            startActivity(i);
         }
-
-        ParsePush parsePush = new ParsePush();
-        parsePush.setData(data);
-        parsePush.setChannel("channel");
-        ParseQuery pQuery = ParseInstallation.getQuery();
-        pQuery.whereEqualTo("fb_id", friendId);
-        final Intent i = new Intent(this, VideoCallActivity.class);
-        i.putExtra("sessionId",sessionId);
-        i.putExtra("publisherToken",token);
-        parsePush.sendDataInBackground(data, pQuery, new SendCallback() {
-            @Override
-            public void done(ParseException e) {
-                startActivity(i);
+        else {
+            subscribeToSelf = false;
+            JSONObject data = new JSONObject();
+            Log.d(LOGTAG, "sessionId: " + sessionId);
+            try {
+                data.put("sessionId", sessionId);
+                data.put("publisherToken", token);
+                data.put("alert", user.getUserName() + " is Video Calling You");
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        });
+
+            ParsePush parsePush = new ParsePush();
+            parsePush.setData(data);
+            parsePush.setChannel("channel");
+            ParseQuery pQuery = ParseInstallation.getQuery();
+            pQuery.whereEqualTo("fb_id", friendId);
+            final Intent i = new Intent(this, VideoCallActivity.class);
+            i.putExtra("sessionId", sessionId);
+            i.putExtra("publisherToken", token);
+            i.putExtra("subscribeToSelf", false);
+            parsePush.sendDataInBackground(data, pQuery, new SendCallback() {
+                @Override
+                public void done(ParseException e) {
+                    startActivity(i);
+                }
+            });
+        }
     }
 }

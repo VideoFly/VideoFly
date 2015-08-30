@@ -195,19 +195,22 @@ public class VideoFlyService  extends Service implements
 
     @Override
     public void onStreamReceived(Session session, Stream stream) {
-        mStreams.add(stream);
-        if (mSubscriber == null) {
-            subscribeToStream(stream);
-        }
-        else{
-            mSession.subscribe(mSubscriber);
+        if(!MainActivity.subscribeToSelf) {
+            mStreams.add(stream);
+            if (mSubscriber == null) {
+                subscribeToStream(stream);
+            } else {
+                mSession.subscribe(mSubscriber);
+            }
         }
     }
 
     @Override
     public void onStreamDropped(Session session, Stream stream) {
-        if ((mSubscriber != null)) {
-            unsubscribeFromStream(stream);
+        if(!MainActivity.subscribeToSelf) {
+            if ((mSubscriber != null)) {
+                unsubscribeFromStream(stream);
+            }
         }
 
     }
@@ -220,12 +223,18 @@ public class VideoFlyService  extends Service implements
     //Publisher.PublisherListener
     @Override
     public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
-
+        if (MainActivity.subscribeToSelf) {
+            mStreams.add(stream);
+            if (mSubscriber == null) {
+                subscribeToStream(stream);
+            }
+        }
     }
 
     @Override
     public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
-
+        if(!MainActivity.subscribeToSelf && mSubscriber != null)
+            unsubscribeFromStream(stream);
     }
 
     @Override

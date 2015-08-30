@@ -6,7 +6,6 @@ import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
 import com.parse.ParsePush;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
@@ -23,7 +22,6 @@ public class Application extends android.app.Application {
 
         Parse.initialize(this, "I7zuvwYhjC8TglLLHeLkUPEbW5Ppx2XS67MUCRDm", "MRXLaui8yk4oBJZoTYjCMsB06n5BVk9iZYot10v6");
         ParseFacebookUtils.initialize(this);
-        ParseObject.registerSubclass(User.class);
         ParseUser.enableAutomaticUser();
         ParseACL defaultACL = new ParseACL();
         ParseACL.setDefaultACL(defaultACL, true);
