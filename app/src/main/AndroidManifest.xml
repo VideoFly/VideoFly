@@ -107,11 +107,14 @@
         </activity>
         <activity
             android:name=".login"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".splash"
-            android:screenOrientation="portrait" >
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
